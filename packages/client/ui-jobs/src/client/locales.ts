@@ -41,5 +41,25 @@ export const en: Record<JobKey, string> = {
   'duration.title.done': 'Took {duration}',
 }
 
+
+
+/** Vietnamese dictionary. */
+export const vi: Record<JobKey, string>  = {
+  'count.live.one': '{count} background job running',
+  'count.live.other': '{count} background jobs running',
+  'count.idle.one': '{count} background job',
+  'count.idle.other': '{count} background jobs',
+  'list.aria': 'Tác vụ nền',
+  'status.running': 'đang chạy',
+  'status.stopping': 'đang dừng',
+  'status.completed': 'đã hoàn thành',
+  'status.killed': 'đã hủy',
+  'status.failed': 'thất bại',
+  'duration.seconds': '{seconds}s',
+  'duration.minutes': '{minutes}m {seconds}s',
+  'duration.hours': '{hours}h {minutes}m',
+  'duration.title.live': 'Running for {duration}',
+  'duration.title.done': 'Took {duration}',
+}
 /** Key domain of the `job` namespace (zh is the source of truth). */
 export type JobKey = keyof typeof zh

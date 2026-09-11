@@ -27,5 +27,19 @@ export const en: Record<keyof typeof zh, string> = {
   'dialog.commandFailed': 'Could not start the Session export.',
 }
 
+
+
+/** Vietnamese dictionary. */
+export const vi: Record<keyof typeof zh, string>  = {
+  'header.more': 'Thêm thao tác',
+  'menu.download': 'Tải nhật ký phiên',
+  'dialog.preparingTitle': 'Đang xuất phiên',
+  'dialog.preparingDescription': 'Đang chuẩn bị ZIP gồm phiên này, phiên con và tệp đính kèm.',
+  'dialog.successTitle': 'Đã bắt đầu tải phiên',
+  'dialog.successDescription': 'Trình duyệt đang tải tệp ZIP của phiên.',
+  'dialog.errorTitle': 'Xuất phiên thất bại',
+  'dialog.close': 'Đóng',
+  'dialog.commandFailed': 'Không bắt đầu được việc xuất phiên.',
+}
 /** Stable locale keys consumed by the shared modal. */
 export type SessionLogDownloadKey = keyof typeof zh

@@ -25,7 +25,7 @@ import { FeedbackDialog } from './FeedbackDialog.tsx'
 import { MessageFeedbackActions } from './MessageFeedbackActions.tsx'
 import type { FeedbackDialogInjected, MessageFeedbackInjected } from './slots.ts'
 import { FeedbackSurface } from './surface.ts'
-import { en, zh } from './locales.ts'
+import { en, vi, zh } from './locales.ts'
 
 export type {
   MessageFeedbackActionFailure, MessageFeedbackActionResult, MessageFeedbackStatus,
@@ -49,7 +49,11 @@ export const inject = ['slots', 'remote', 'remote.messageFeedback', 'remote.sess
  * @param ctx - client root context.
  */
 export function apply(ctx: ClientContext): void {
-  ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'ui-message-feedback: dictionaries')
+  ctx.effect(() => {
+    const dispose = ctx.locale.register(NS, { zh, en })
+    const disposeVi = ctx.locale.register(NS, 'vi', vi)
+    return () => { dispose(); disposeVi() }
+  }, 'ui-message-feedback: dictionaries')
 
   const surfaces = new Map<SessionId, FeedbackSurface>()
   const surfaceFor = (sessionId: SessionId): FeedbackSurface => {

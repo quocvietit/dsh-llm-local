@@ -3,14 +3,18 @@ import type { Context } from '@deepseek-ai/cordis'
 import type {} from '../index.ts'
 import { CodeBody } from './CodeBody.tsx'
 import { CODE_EXTENSIONS } from './languages.ts'
-import { en, zh } from './locales.ts'
+import { en, vi, zh } from './locales.ts'
 
 const ID = '@deepseek-ai/dsh-client-ui-sidebar-documentpreview/code'
 const NS = 'sidebarCodePreview'
 
 /** @param ctx - owning plugin context. Register localized metadata and the matching keyed document body. */
 export function apply(ctx: Context): void {
-  ctx.effect(() => ctx.locale.register(NS, { zh, en }))
+  ctx.effect(() => {
+    const dispose = ctx.locale.register(NS, { zh, en })
+    const disposeVi = ctx.locale.register(NS, 'vi', vi)
+    return () => { dispose(); disposeVi() }
+  })
   const t = ctx.locale.bind(NS)
   ctx.effect(() => ctx.documentPreviews.register({
     id: ID,

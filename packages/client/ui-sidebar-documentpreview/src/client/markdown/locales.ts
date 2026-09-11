@@ -17,6 +17,15 @@ export const en = {
   'footnotes': 'Footnotes',
 } satisfies Record<MarkdownPreviewKey, string>
 
+/** Vietnamese dictionary. */
+export const vi = {
+  'viewer.label': 'Markdown',
+  'code.copy': 'Sao chép',
+  'code.copied': 'Đã sao chép',
+  'footnotes': 'Chú thích',
+}
+
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Markdown document renderer and its code/footnote controls. */

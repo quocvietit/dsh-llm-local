@@ -38,3 +38,22 @@ export const en = {
   'listbox.aria': '/{command} matches',
   'notice.attachmentsUnsupported': '/{command} does not accept attachments; remove them first',
 } satisfies Record<CommandKey, string>
+
+/** Vietnamese dictionary. */
+export const vi = {
+  'description.compact': 'Nén lịch sử hội thoại cũ',
+  'description.export': 'Tải nhật ký phiên này dưới dạng ZIP',
+  'description.feedback': 'ghi phản hồi về phiên này',
+  'description.goal': 'đặt hoặc xem mục tiêu cho tác vụ chạy dài',
+  'description.permission': 'Đổi preset quyền (sandbox + chính sách phê duyệt)',
+  'description.plan': 'Vào hoặc thoát chế độ kế hoạch',
+  'search.placeholder': 'Tìm kiếm…',
+  'search.aria': 'Lọc lựa chọn',
+  'status.loading': 'Đang tải lựa chọn…',
+  'status.applying': 'Đang áp dụng…',
+  'status.empty': 'Không có lựa chọn',
+  'overlay.aria': 'Tùy chọn /{command}',
+  'listbox.aria': 'Kết quả /{command}',
+  'notice.attachmentsUnsupported': '/{command} không nhận tệp đính kèm; hãy gỡ chúng trước',
+}
+

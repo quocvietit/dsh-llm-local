@@ -47,5 +47,28 @@ export const en: Record<WorkflowRunKey, string> = {
   'status.interrupted': 'Interrupted',
 }
 
+
+
+/** Vietnamese dictionary. */
+export const vi: Record<WorkflowRunKey, string>  = {
+  'run.title': '{name}',
+  'run.members.one': '{count} member',
+  'run.members.other': '{count} members',
+  'run.empty': 'No members started',
+  'phase.unassigned': 'Unphased',
+  'phase.empty': 'Empty phase name',
+  'statusCount.running': 'Running {count}',
+  'statusCount.completed': 'Completed {count}',
+  'statusCount.failed': 'Thất bại {count}',
+  'statusCount.cancelled': 'Cancelled {count}',
+  'statusCount.interrupted': 'Interrupted {count}',
+  'member.empty': 'Empty member name',
+  'member.open': 'Open {name}',
+  'status.running': 'Đang chạy',
+  'status.completed': 'Đã hoàn thành',
+  'status.failed': 'Thất bại',
+  'status.cancelled': 'Cancelled',
+  'status.interrupted': 'Bị gián đoạn',
+}
 /** Union of this namespace's dictionary keys. */
 export type WorkflowRunKey = keyof typeof zh

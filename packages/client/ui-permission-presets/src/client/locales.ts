@@ -35,6 +35,23 @@ export const en = {
   'confirm.enable': 'Enable Full access',
 } satisfies Record<PermissionSettingsKey, string>
 
+/** Vietnamese dictionary. */
+export const vi = {
+  'title': 'Quyền',
+  'description': 'Chọn chế độ quyền mặc định cho phiên mới',
+  'loading': 'Đang tải',
+  'unavailable': 'Không khả dụng',
+  'preset.readOnly': 'Chỉ xem',
+  'preset.workspaceWrite': 'Ghi trong workspace',
+  'preset.fullAccess': 'Toàn quyền',
+  'confirm.title': 'Bật toàn quyền?',
+  'confirm.description': 'Toàn quyền giúp phiên mới giảm bước xác nhận và thực hiện nhiều thao tác trực tiếp hơn, gồm thao tác nhạy cảm, thay đổi tệp hoặc lệnh bên ngoài. Chỉ dùng khi bạn tin các tác vụ sau đó.',
+  'confirm.acknowledge': 'Tôi hiểu rủi ro và muốn tiếp tục',
+  'confirm.cancel': 'Hủy',
+  'confirm.enable': 'Bật toàn quyền',
+}
+
+
 /** Simplified Chinese dictionary for the current-session popup gate. */
 export const accessZh = {
   'preset.readOnly': '仅可查看',
@@ -60,4 +77,16 @@ export const accessEn = {
   'confirm.acknowledge': 'I understand the risks and want to continue',
   'confirm.cancel': 'Cancel',
   'confirm.enable': 'Enable Full access',
+} satisfies Record<PermissionAccessKey, string>
+
+/** Vietnamese dictionary for the current-session popup gate. */
+export const accessVi = {
+  'preset.readOnly': 'Chỉ xem',
+  'preset.workspaceWrite': 'Ghi trong workspace',
+  'preset.fullAccess': 'Toàn quyền',
+  'confirm.title': 'Bật toàn quyền?',
+  'confirm.description': 'Toàn quyền giảm bước xác nhận và cho phép tác nhân thực hiện nhiều thao tác trực tiếp hơn, gồm thao tác nhạy cảm, thay đổi tệp hoặc lệnh bên ngoài. Chỉ dùng khi bạn tin tác vụ hiện tại.',
+  'confirm.acknowledge': 'Tôi hiểu rủi ro và muốn tiếp tục',
+  'confirm.cancel': 'Hủy',
+  'confirm.enable': 'Bật toàn quyền',
 } satisfies Record<PermissionAccessKey, string>

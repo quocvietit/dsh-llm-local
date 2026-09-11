@@ -87,5 +87,48 @@ export const en: Record<DeliverablesKey, string> = {
   'produced.open': 'Open {name}',
 }
 
+
+
+/** Vietnamese dictionary. */
+export const vi: Record<DeliverablesKey, string>  = {
+  'presented.nativeUnavailable': 'Tệp này không có đường dẫn Host. Hãy xem trước trên thanh bên.',
+  'presented.revealError': 'Could not show in file manager. Try again.',
+  'presented.directoryError': 'Could not open containing folder. Try again.',
+  'presented.directoryOpening': 'Opening containing folder…',
+  'presented.directoryOpened': 'Requested opening containing folder',
+  'presented.revealed': 'Requested display in file manager',
+  'presented.revealing': 'Showing in file manager…',
+  'presented.unavailable': 'Host này không có desktop để mở tệp hoặc thư mục',
+  'presented.retry': 'Thử lại',
+  'presented.hostError': 'Không đọc được thông tin desktop của Host',
+  'presented.directory': 'Mở thư mục chứa',
+  'presented.explorer': 'Hiện trong File Explorer',
+  'presented.finder': 'Hiện trong Finder',
+  'presented.defaultApp': 'Mở bằng ứng dụng mặc định',
+  'presented.more': 'More file actions for {name}',
+  'presented.action': 'Mở',
+  'presented.preview': 'Xem trước ở thanh bên',
+  'presented.previewButton': 'Open {name} in sidebar',
+  'presented.previewCard': 'Preview {name} in sidebar',
+  'presented.all': 'All {count} files',
+  'presented.expandAria': 'Show all {count} delivered files',
+  'presented.collapse': 'Thu gọn',
+  'presented.collapseAria': 'Collapse delivered files',
+  'presented.opening': 'Opening…',
+  'presented.opened': 'Opened in default app',
+  'presented.error': 'Không mở được. Nhấp để thử lại.',
+  'presented.file': 'Tệp',
+  'row.title': 'Tệp bàn giao',
+  'row.running': 'Đang bàn giao',
+  'row.ok': 'Đã bàn giao',
+  'row.error': 'Bàn giao thất bại',
+  'row.stopped': 'Bị gián đoạn',
+  'row.inspect': 'Inspect call',
+  'presented.open': 'Open {name} in default app',
+  'produced.label': 'Tệp đã thay đổi',
+  'produced.moreOne': '+ 1 file',
+  'produced.more': '+ {count} files',
+  'produced.open': 'Open {name}',
+}
 /** Union of this namespace's dictionary keys. */
 export type DeliverablesKey = keyof typeof zh
