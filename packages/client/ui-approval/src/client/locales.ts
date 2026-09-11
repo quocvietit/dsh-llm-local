@@ -20,3 +20,13 @@ export const en = {
   reject: 'Reject',
   allowOnce: 'Allow once',
 } satisfies Record<ApprovalKey, string>
+
+/** Vietnamese dictionary. */
+export const vi = {
+  waiting: 'Đang chờ phê duyệt',
+  'detail.aria': 'Chi tiết phê duyệt',
+  escalation: 'Tool {toolName} requests privileged execution',
+  reject: 'Từ chối',
+  allowOnce: 'Cho phép một lần',
+}
+

@@ -60,3 +60,28 @@ export const en = {
   'blocked.composer': 'This model is unavailable — select one to continue',
   'empty.efforts': 'This model provides no reasoning effort levels.',
 } satisfies Record<ModelKey, string>
+
+/** Vietnamese dictionary. */
+export const vi = {
+  'command.description': 'Chọn mô hình cho hội thoại này',
+  'option.loadError': 'Không tải được danh mục: {message}',
+  'option.deepseekV4Flash.description': 'Nhanh, hiệu quả và tiết kiệm; phù hợp tác vụ tập trung, thường xuyên hoặc song song.',
+  'option.deepseekV4Pro.description': 'Mạnh hơn về lập trình tác nhân, kiến thức và suy luận khó; phù hợp tác vụ phức tạp hoặc cần chất lượng, với chi phí cao hơn.',
+  'trigger.fallback': 'Chọn mô hình',
+  'trigger.loading': 'Đang tải mô hình…',
+  'trigger.selectAria': 'Chọn mô hình',
+  'trigger.aria': 'Chọn mô hình, hiện tại {model}',
+  'trigger.ariaEffort': 'Chọn mô hình, hiện tại {model}, mức suy luận {effort}',
+  'menu.aria': 'Mô hình và mức suy luận',
+  'menu.model': 'Mô hình',
+  'menu.effort': 'Mức',
+  'effort.providerDefault': 'Mặc định',
+  'status.loading': 'Đang làm mới danh sách mô hình…',
+  'error.action': 'Thao tác mô hình thất bại: {message}',
+  'action.reload': 'Tải lại',
+  'warning.groupLoad': '{name} không tải được: {message}',
+  'empty.models': 'Không có mô hình.',
+  'blocked.composer': 'Mô hình này không khả dụng — hãy chọn mô hình khác để tiếp tục',
+  'empty.efforts': 'Mô hình này không có mức suy luận.',
+}
+
