@@ -2165,6 +2165,42 @@ export const SERVICE_API: readonly ServiceApiEntry[] = [
     ],
   },
   {
+    key: 'skillLibrary',
+    summary: 'Remote service for the Settings skill library.',
+    description: 'Remote service for the Settings skill library.',
+    methods: [
+      {
+        signature: '@Remote async list(request: SkillLibraryListRequest, signal: AbortSignal): Promise<SkillLibraryListValue>',
+        description: 'List editable skills from the user and project roots, plus read-only registry skills.',
+        parameters: [{ name: 'request', description: 'optional project workspace used to scan `.dsh/skills`.' }, { name: 'signal', description: 'caller lifetime; listing does not abort in-flight disk reads.' }],
+        returns: 'editable disk rows plus read-only registry rows.',
+      },
+      {
+        signature: '@Remote async get(request: SkillLibraryGetRequest, signal: AbortSignal): Promise<SkillLibraryRecord>',
+        description: 'Load one skill body for the editor.',
+        parameters: [{ name: 'request', description: 'name, location, and optional project workspace.' }, { name: 'signal', description: 'caller lifetime; unused by the disk read.' }],
+        returns: 'the catalog row plus Markdown body.',
+      },
+      {
+        signature: '@Remote async create(request: SkillLibraryWriteRequest, signal: AbortSignal): Promise<SkillLibraryRecord>',
+        description: 'Create a directory-bundle skill under a writable root.',
+        parameters: [{ name: 'request', description: 'name, description, body, and target location.' }, { name: 'signal', description: 'caller lifetime; unused by the disk write.' }],
+        returns: 'the created skill record.',
+      },
+      {
+        signature: '@Remote async update(request: SkillLibraryWriteRequest, signal: AbortSignal): Promise<SkillLibraryRecord>',
+        description: 'Replace the Markdown of an existing writable skill.',
+        parameters: [{ name: 'request', description: 'name, description, body, and target location.' }, { name: 'signal', description: 'caller lifetime; unused by the disk write.' }],
+        returns: 'the updated skill record.',
+      },
+      {
+        signature: '@Remote async delete(request: SkillLibraryRemoveRequest, signal: AbortSignal): Promise<void>',
+        description: 'Delete one writable skill file or bundle directory.',
+        parameters: [{ name: 'request', description: 'name and location of the skill to remove.' }, { name: 'signal', description: 'caller lifetime; unused by the disk delete.' }],
+      },
+    ],
+  },
+  {
     key: 'skills',
     summary: 'Layered registry of skill providers, the host+per-scope shape the tools registry established.',
     description: 'Layered registry of skill providers, the host+per-scope shape the tools registry established. A registration files into the layer of its calling context\'s scope (scopeOf): host rows and repository plugins land in the global layer, while a plugin mounted by an agent preset\'s standing composition lands in that preset\'s layer. A read merges the global layer with the viewing scope\'s chain — the nearest layer\'s entry wins a duplicate name outright, and the rank order decides duplicates only within one layer. It exposes sorted invocation-neutral summaries and loads full skill bodies on demand.',
@@ -5621,6 +5657,42 @@ export const TYPE_API: readonly TypeApiEntry[] = [
   {
     name: 'SkillInvocationPolicy',
     declaration: 'export interface SkillInvocationPolicy {\n    readonly modelInvocable: boolean;\n    readonly userInvocable: boolean;\n}',
+  },
+  {
+    name: 'SkillLibraryEntry',
+    declaration: 'export interface SkillLibraryEntry {\n    readonly name: string;\n    readonly description: string;\n    readonly whenToUse?: string;\n    readonly source: string;\n    readonly location: SkillLibraryEntryLocation;\n    readonly editable: boolean;\n}',
+  },
+  {
+    name: 'SkillLibraryEntryLocation',
+    declaration: 'export type SkillLibraryEntryLocation = SkillLibraryLocation | \'other\';',
+  },
+  {
+    name: 'SkillLibraryGetRequest',
+    declaration: 'export interface SkillLibraryGetRequest {\n    readonly name: string;\n    readonly location: SkillLibraryEntryLocation;\n    readonly workspaceRoot?: string;\n}',
+  },
+  {
+    name: 'SkillLibraryListRequest',
+    declaration: 'export interface SkillLibraryListRequest {\n    readonly workspaceRoot?: string;\n}',
+  },
+  {
+    name: 'SkillLibraryListValue',
+    declaration: 'export interface SkillLibraryListValue {\n    readonly skills: readonly SkillLibraryEntry[];\n}',
+  },
+  {
+    name: 'SkillLibraryLocation',
+    declaration: 'export type SkillLibraryLocation = \'user\' | \'project\';',
+  },
+  {
+    name: 'SkillLibraryRecord',
+    declaration: 'export interface SkillLibraryRecord extends SkillLibraryEntry {\n    readonly body: string;\n}',
+  },
+  {
+    name: 'SkillLibraryRemoveRequest',
+    declaration: 'export interface SkillLibraryRemoveRequest {\n    readonly name: string;\n    readonly location: SkillLibraryLocation;\n    readonly workspaceRoot?: string;\n}',
+  },
+  {
+    name: 'SkillLibraryWriteRequest',
+    declaration: 'export interface SkillLibraryWriteRequest {\n    readonly name: string;\n    readonly description: string;\n    readonly whenToUse?: string;\n    readonly body: string;\n    readonly location: SkillLibraryLocation;\n    readonly workspaceRoot?: string;\n}',
   },
   {
     name: 'SkillListRequest',

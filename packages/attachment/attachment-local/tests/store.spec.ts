@@ -19,6 +19,8 @@ import {
 const fsControl = vi.hoisted(() => ({
   readSignals: [] as AbortSignal[],
   syncedDirectories: [] as string[],
+  chmodMode: 'passthrough' as 'passthrough' | 'eperm',
+  chmodFailures: [] as string[],
 }))
 
 vi.mock('node:fs/promises', async (importOriginal) => {
@@ -36,6 +38,15 @@ vi.mock('node:fs/promises', async (importOriginal) => {
     async open(...args: Parameters<typeof actual.open>): ReturnType<typeof actual.open> {
       if (args[1] === constants.O_RDONLY) fsControl.syncedDirectories.push(String(args[0]))
       return actual.open(...args)
+    },
+    async chmod(...args: Parameters<typeof actual.chmod>): ReturnType<typeof actual.chmod> {
+      if (fsControl.chmodMode === 'eperm') {
+        fsControl.chmodFailures.push(String(args[0]))
+        const error = new Error('EPERM: operation not permitted, chmod') as NodeJS.ErrnoException
+        error.code = 'EPERM'
+        throw error
+      }
+      return actual.chmod(...args)
     },
   }
 })
@@ -76,6 +87,8 @@ function parentChainToRoot(path: string): string[] {
 }
 
 afterEach(async () => {
+  fsControl.chmodMode = 'passthrough'
+  fsControl.chmodFailures.length = 0
   await Promise.all(roots.splice(0).map(path => rm(path, { recursive: true, force: true })))
 })
 
@@ -116,6 +129,14 @@ describe('local attachment store', () => {
 
     const ref = await saveImageFile(storageRoot, { data: PNG, mediaType: 'image/png' }, LIMITS, POLICY)
 
+    await expect(readImageFile(storageRoot, ref)).resolves.toEqual({ ref, data: PNG })
+  })
+
+  it('publishes when chmod is refused on a bind-mounted home', async () => {
+    fsControl.chmodMode = 'eperm'
+    const storageRoot = await root()
+    const ref = await saveImageFile(storageRoot, { data: PNG, mediaType: 'image/png' }, LIMITS, POLICY)
+    expect(fsControl.chmodFailures.length).toBeGreaterThan(0)
     await expect(readImageFile(storageRoot, ref)).resolves.toEqual({ ref, data: PNG })
   })
 

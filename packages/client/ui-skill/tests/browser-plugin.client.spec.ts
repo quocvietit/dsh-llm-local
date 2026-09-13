@@ -137,6 +137,10 @@ describe('apply', () => {
           'menu.userOnly': 'user-only',
         },
       },
+    },
+    {
+      namespace: 'skill',
+      dictionaries: 'vi',
     }])
   })
 
@@ -282,6 +286,18 @@ describe('catalog cache', () => {
     await source.candidates(proj('s2'), req(''))
     expect(payloads).toHaveLength(3)
     expect(payloads[2]).toEqual({ sessionId: 's1' })
+  })
+
+  it('skills/change clears every cached session', async () => {
+    const { list, payloads } = countingList()
+    const { source, remote } = await bench(list)
+    await source.candidates(proj('s1'), req(''))
+    await source.candidates(proj('s2'), req(''))
+    expect(payloads).toHaveLength(2)
+    remote.emit('skills/change', [])
+    await source.candidates(proj('s1'), req(''))
+    await source.candidates(proj('s2'), req(''))
+    expect(payloads).toHaveLength(4)
   })
 
   it('connection/reset clears every cached session', async () => {

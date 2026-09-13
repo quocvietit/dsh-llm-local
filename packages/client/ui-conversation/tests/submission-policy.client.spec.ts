@@ -2,7 +2,7 @@
 import { describe, expect, it, vi } from 'vitest'
 import { stubSettingsScope } from '@deepseek-ai/dsh-client-test-runtime'
 import {
-  ComposerSubmissionPolicy, DEFAULT_BUSY_ENTER_BEHAVIOR, resolveSubmitMode,
+  ComposerSubmissionPolicy, DEFAULT_BUSY_ENTER_BEHAVIOR, DEFAULT_PLAIN_ENTER_BEHAVIOR, resolveSubmitMode,
 } from '../src/client/input/submission-policy.ts'
 import type { ConversationSettings } from '../src/submission-settings.ts'
 
@@ -27,6 +27,7 @@ describe('ComposerSubmissionPolicy', () => {
   it('defaults to Queue and publishes preference changes', () => {
     const policy = new ComposerSubmissionPolicy()
     expect(policy.busyEnter.getSnapshot()).toBe(DEFAULT_BUSY_ENTER_BEHAVIOR)
+    expect(policy.plainEnter.getSnapshot()).toBe(DEFAULT_PLAIN_ENTER_BEHAVIOR)
 
     const changed = vi.fn()
     policy.busyEnter.subscribe(changed)
@@ -51,7 +52,9 @@ describe('ComposerSubmissionPolicy', () => {
     policy.setBusyEnter('steer')
     expect(observed).toEqual(['busyEnter=steer:steer'])
     expect(host.set).toHaveBeenCalledWith('busyEnter', 'steer')
-    expect(host.set).toHaveBeenCalledOnce()
+    policy.setPlainEnter('send')
+    expect(observed).toEqual(['busyEnter=steer:steer', 'plainEnter=send:steer'])
+    expect(host.set).toHaveBeenCalledWith('plainEnter', 'send')
   })
 
   it('adopts a Host preference without writing it back and leaves an identical write untouched', () => {

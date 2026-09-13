@@ -98,6 +98,7 @@ interface BenchOptions {
   addFiles?: (files: readonly File[]) => string | null
   commandMenuOpen?: boolean
   busyEnter?: 'queue' | 'steer'
+  plainEnter?: 'newline' | 'send'
   toggleCommandMenu?: (selection: { start: number; end: number }) => void
 }
 
@@ -152,6 +153,7 @@ function bench(over?: BenchOptions) {
   const removeAttachment = vi.fn((id: DraftAttachmentId) => { shell.removeAttachment(id) })
   const menuLauncher = createSnapshotStore<string | null>(over?.commandMenuOpen === true ? 'command' : null)
   const busyEnter = createSnapshotStore<'queue' | 'steer'>(over?.busyEnter ?? 'queue')
+  const plainEnter = createSnapshotStore<'newline' | 'send'>(over?.plainEnter ?? 'newline')
   const slotCalls: { key: string; owner: unknown }[] = []
   const renderSlot = ((key: string, owner: object) => {
     slotCalls.push({ key, owner })
@@ -197,6 +199,7 @@ function bench(over?: BenchOptions) {
     }),
     toggleCommandMenu: over?.toggleCommandMenu ?? vi.fn(),
     useBusyEnter: bindSnapshotSelector(busyEnter),
+    usePlainEnter: bindSnapshotSelector(plainEnter),
     useNotices: bindSnapshotSelector(shell.notices),
     useLexicon: bindSnapshotSelector(shell.lexicon),
     useMenuLauncher: bindSnapshotSelector(menuLauncher),
@@ -451,7 +454,7 @@ describe('image draft rail', () => {
       { kind: 'image' as const, id: 'draft-1' as DraftAttachmentId, file, previewUrl: 'blob:draft-1' },
       { kind: 'image' as const, id: 'draft-2' as DraftAttachmentId, file: extra, previewUrl: 'blob:draft-2' },
     ]
-    const result = bench({ attachments })
+    const result = bench({ attachments, plainEnter: 'send' })
     const { view, textarea, sink, removeAttachment } = result
     expect((view.getByRole('button', { name: '发送消息' }) as HTMLButtonElement).disabled).toBe(false)
     const owner = attachmentOwner(result.slotCalls)
@@ -472,7 +475,7 @@ describe('image draft rail', () => {
     const attachments = [
       { kind: 'image' as const, id: 'draft-1' as DraftAttachmentId, file, previewUrl: 'blob:draft-1' },
     ]
-    const result = bench({ attachments })
+    const result = bench({ attachments, plainEnter: 'send' })
     const { textarea, sink } = result
     let fail!: (outcome: SubmitOutcome) => void
     sink.mockImplementationOnce(() => new Promise<SubmitOutcome>((resolve) => { fail = resolve }))
@@ -575,7 +578,7 @@ describe('Enter semantics', () => {
   })
 
   it('plain Enter submits queue mode through the machine; repeat and empty are suppressed', () => {
-    const { textarea, sink } = bench({ draft: 'hello' })
+    const { textarea, sink } = bench({ draft: 'hello', plainEnter: 'send' })
     fireEvent.keyDown(textarea, { key: 'Enter' })
     expect(sink).toHaveBeenCalledWith('hello', [], 'queue', expect.any(AbortSignal))
     // The submitting-phase lock, not draft emptiness, suppresses the repeat:
@@ -583,7 +586,7 @@ describe('Enter semantics', () => {
     fireEvent.keyDown(textarea, { key: 'Enter', repeat: true })
     fireEvent.keyDown(textarea, { key: 'Enter' })
     expect(sink).toHaveBeenCalledTimes(1)
-    const empty = bench({ draft: '   ' })
+    const empty = bench({ draft: '   ', plainEnter: 'send' })
     fireEvent.keyDown(empty.textarea, { key: 'Enter' })
     expect(empty.sink).not.toHaveBeenCalled()
   })
@@ -593,6 +596,26 @@ describe('Enter semantics', () => {
     fireEvent.keyDown(textarea, { key: 'a' })
     fireEvent.keyDown(textarea, { key: 'Enter', shiftKey: true })
     expect(sink).not.toHaveBeenCalled()
+  })
+
+  it('unmodified Enter inserts a newline by default; Ctrl/Alt+Enter send', () => {
+    const { textarea, sink } = bench({ draft: 'hello' })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+    expect(sink).not.toHaveBeenCalled()
+
+    const ctrl = bench({ draft: 'hello' })
+    fireEvent.keyDown(ctrl.textarea, { key: 'Enter', ctrlKey: true })
+    expect(ctrl.sink).toHaveBeenCalledWith('hello', [], 'queue', expect.any(AbortSignal))
+
+    const alt = bench({ draft: 'hello' })
+    fireEvent.keyDown(alt.textarea, { key: 'Enter', altKey: true })
+    expect(alt.sink).toHaveBeenCalledWith('hello', [], 'queue', expect.any(AbortSignal))
+  })
+
+  it('Settings send-on-Enter restores unmodified Enter as submit', () => {
+    const { textarea, sink } = bench({ draft: 'hello', plainEnter: 'send' })
+    fireEvent.keyDown(textarea, { key: 'Enter' })
+    expect(sink).toHaveBeenCalledWith('hello', [], 'queue', expect.any(AbortSignal))
   })
 
   it('Shift+Enter newline wins even inside IME composition (unconditional precedence)', () => {
@@ -762,7 +785,7 @@ describe('Enter semantics', () => {
   it('composition Enter never sends: ref guard, isComposing, and keyCode 229 paths', () => {
     vi.useFakeTimers()
     try {
-      const { textarea, sink } = bench({ draft: 'hello' })
+      const { textarea, sink } = bench({ draft: 'hello', plainEnter: 'send' })
       fireEvent.compositionStart(textarea)
       fireEvent.keyDown(textarea, { key: 'Enter' })
       expect(sink).not.toHaveBeenCalled()
@@ -919,7 +942,7 @@ describe('running and lock semantics', () => {
   })
 
   it('running plain Enter follows the busy-state Steer preference', () => {
-    const { textarea, sink } = bench({ running: true, busyEnter: 'steer', draft: '直接插话' })
+    const { textarea, sink } = bench({ running: true, busyEnter: 'steer', draft: '直接插话', plainEnter: 'send' })
     fireEvent.keyDown(textarea, { key: 'Enter' })
     expect(sink).toHaveBeenCalledWith('直接插话', [], 'steer', expect.any(AbortSignal))
   })
@@ -1041,7 +1064,7 @@ describe('running and lock semantics', () => {
       },
       parentAvailable: true,
     }
-    const plain = bench({ running: true, busyEnter: 'steer', draft: 'plain', subagent })
+    const plain = bench({ running: true, busyEnter: 'steer', draft: 'plain', subagent, plainEnter: 'send' })
     fireEvent.keyDown(plain.textarea, { key: 'Enter' })
     expect(plain.sink).toHaveBeenCalledWith('plain', [], 'steer', expect.any(AbortSignal))
 

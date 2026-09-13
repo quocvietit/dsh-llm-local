@@ -19,7 +19,7 @@ import type {
   ComposerKeyboard, DraftAttachmentId, EditSelection, InputActions, InputNotice, InputState,
 } from './input.ts'
 import type { createConversationStore } from '../stores.ts'
-import type { BusyEnterBehavior } from './composer-submission.ts'
+import type { BusyEnterBehavior, PlainEnterBehavior } from './composer-submission.ts'
 import type { ConversationSnapshot } from './snapshot.ts'
 import type { ViewTab } from './views.ts'
 
@@ -313,13 +313,15 @@ export interface ComposerBarInjected {
   toggleCommandMenu: ((selection: EditSelection) => void) | undefined
   stop: (() => void) | undefined
   command: ((line: string) => Promise<boolean>) | undefined
-  hooks: {
-    /**
-     * Live busy-state submission preference: the delivery mode plain Enter
-     * and the primary Send button use while the addressed agent is busy.
-     */
-    busyEnter: ObservableSnapshot<BusyEnterBehavior>
-    /** Live per-draft upload states for file-kind drafts. */
+    hooks: {
+      /**
+       * Live busy-state submission preference: the delivery mode a send
+       * gesture and the primary Send button use while the addressed agent is busy.
+       */
+      busyEnter: ObservableSnapshot<BusyEnterBehavior>
+      /** Live unmodified-Enter preference: newline vs send. */
+      plainEnter: ObservableSnapshot<PlainEnterBehavior>
+      /** Live per-draft upload states for file-kind drafts. */
     fileUploads: ObservableSnapshot<DraftFileUploads>
     notices: ObservableSnapshot<InputNotice | null>
     lexicon: ObservableSnapshot<ReadonlyMap<'/' | '@', readonly string[]>>

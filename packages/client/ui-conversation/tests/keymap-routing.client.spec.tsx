@@ -24,6 +24,7 @@ describe('keymap keydown routing', () => {
       space: () => false,
       dismissPopup: () => {},
       canSubmit: () => true,
+      plainEnter: () => 'send',
       submit,
       intakeFiles: () => {},
       pasteText: () => {},
@@ -50,6 +51,7 @@ describe('keymap keydown routing', () => {
       space: () => false,
       dismissPopup: () => {},
       canSubmit: () => true,
+      plainEnter: () => 'send',
       submit: () => {},
       intakeFiles: () => {},
       pasteText: () => {},
@@ -61,5 +63,31 @@ describe('keymap keydown routing', () => {
     expect(picked).toBe(false) // picked: the completion replaces native traversal
     const passed = fireEvent.keyDown(root, { key: 'Tab', keyCode: 9 })
     expect(passed).toBe(true) // pass: the browser keeps native focus traversal
+  })
+
+  it('newline preference leaves unmodified Enter for Lexical and submits Ctrl/Alt+Enter', () => {
+    const editor = createEditor({ namespace: 'keymap-routing', onError: (e) => { throw e } })
+    const root = document.createElement('div')
+    root.contentEditable = 'true'
+    document.body.appendChild(root)
+    editor.setRootElement(root)
+    registerPlainText(editor)
+    const submit = vi.fn()
+    registerComposerKeymap(editor, {
+      arbitrate: () => 'pass',
+      space: () => false,
+      dismissPopup: () => {},
+      canSubmit: () => true,
+      plainEnter: () => 'newline',
+      submit,
+      intakeFiles: () => {},
+      pasteText: () => {},
+    })
+    expect(fireEvent.keyDown(root, { key: 'Enter' })).toBe(true)
+    expect(submit).not.toHaveBeenCalled()
+    fireEvent.keyDown(root, { key: 'Enter', altKey: true })
+    expect(submit).toHaveBeenCalledWith(false)
+    fireEvent.keyDown(root, { key: 'Enter', ctrlKey: true })
+    expect(submit).toHaveBeenCalledWith(true)
   })
 })

@@ -1,29 +1,32 @@
 /**
- * Composer submission policy. It owns the live busy-Enter preference and
- * resolves submission gestures into queue/steer delivery modes; Host and
- * Agent keep the actual delivery-window authority.
+ * Composer submission policy. It owns the live busy-Enter and plain-Enter
+ * preferences and resolves submission gestures into queue/steer delivery
+ * modes; Host and Agent keep the actual delivery-window authority.
  */
 import {
   createSnapshotStore, type SnapshotStore,
 } from '@deepseek-ai/dsh-client-store'
 import type { SettingsScope } from '@deepseek-ai/dsh-client-ui-settings/client'
 import type {
-  BusyEnterBehavior, ComposerSubmitGesture, InputSubmitMode,
+  BusyEnterBehavior, ComposerSubmitGesture, InputSubmitMode, PlainEnterBehavior,
 } from '../contract/composer-submission.ts'
-import { BUSY_ENTER_FIELD, DEFAULT_BUSY_ENTER_BEHAVIOR } from '../../submission-settings.ts'
+import {
+  BUSY_ENTER_FIELD, DEFAULT_BUSY_ENTER_BEHAVIOR, DEFAULT_PLAIN_ENTER_BEHAVIOR,
+  PLAIN_ENTER_FIELD,
+} from '../../submission-settings.ts'
 import type { ConversationSettings } from '../../submission-settings.ts'
 
-export { DEFAULT_BUSY_ENTER_BEHAVIOR } from '../../submission-settings.ts'
+export { DEFAULT_BUSY_ENTER_BEHAVIOR, DEFAULT_PLAIN_ENTER_BEHAVIOR } from '../../submission-settings.ts'
 
 /**
  * Resolve one submission gesture against the busy-Enter preference. Plain
- * Enter and the primary Send button share the `enter` gesture, so the button
- * delivers exactly what Enter would. Direct `steer` is intentionally
- * best-effort: AgentLoop turns a closed-window submission into the next waking
- * Queue item.
+ * Enter (when it is a send) and the primary Send button share the `enter`
+ * gesture, so the button delivers exactly what that send would. Direct
+ * `steer` is intentionally best-effort: AgentLoop turns a closed-window
+ * submission into the next waking Queue item.
  * @param preferred - the live busy-Enter preference.
  * @param running - whether the addressed agent currently reports busy.
- * @param gesture - plain Enter (or the Send button) or the Cmd/Ctrl-accelerated chord.
+ * @param gesture - a send (or the Send button) or the Cmd/Ctrl-accelerated chord.
  * @param steeringAvailable - whether this session transport supports steering.
  * @returns Queue outside steer-capable busy state; otherwise the preferred mode or its opposite.
  */
@@ -39,13 +42,16 @@ export function resolveSubmitMode(
 }
 
 /**
- * Busy-Enter preference shared by the composer bar inject face and its
- * Settings row: one live store the bar's submission gestures and Send label
- * read, backed by the Host user-settings document when one is composed.
+ * Busy-Enter and plain-Enter preferences shared by the composer bar inject
+ * face and its Settings rows: one live store the bar's submission gestures
+ * and Send label read, backed by the Host user-settings document when one
+ * is composed.
  */
 export class ComposerSubmissionPolicy {
-  /** Reactive preference source for the composer bar and the Settings row. */
+  /** Reactive busy-state preference for the composer bar and the Settings row. */
   readonly busyEnter: SnapshotStore<BusyEnterBehavior> = createSnapshotStore(DEFAULT_BUSY_ENTER_BEHAVIOR)
+  /** Reactive unmodified-Enter preference: newline vs send. */
+  readonly plainEnter: SnapshotStore<PlainEnterBehavior> = createSnapshotStore(DEFAULT_PLAIN_ENTER_BEHAVIOR)
   private readonly host: SettingsScope<ConversationSettings> | undefined
 
   /**
@@ -74,12 +80,29 @@ export class ComposerSubmissionPolicy {
   }
 
   /**
-   * Adopt the scope's accepted durable behavior without writing it back.
+   * Change whether unmodified Enter sends; the live value publishes before
+   * the durable write starts.
+   * @param behavior - newline or send.
+   */
+  setPlainEnter(behavior: PlainEnterBehavior): void {
+    if (this.plainEnter.getSnapshot() === behavior) return
+    this.plainEnter.set(behavior)
+    void this.host?.set(PLAIN_ENTER_FIELD, behavior)
+  }
+
+  /**
+   * Adopt the scope's accepted durable behaviors without writing them back.
    * @param host - the constructor-narrowed scope driving this adoption.
    */
   private adopt(host: SettingsScope<ConversationSettings>): void {
     const section = host.getSnapshot().value
-    if (section === undefined || this.busyEnter.getSnapshot() === section.busyEnter) return
-    this.busyEnter.set(section.busyEnter)
+    if (section === undefined) return
+    if (this.busyEnter.getSnapshot() !== section.busyEnter) {
+      this.busyEnter.set(section.busyEnter)
+    }
+    const plainEnter = section.plainEnter ?? DEFAULT_PLAIN_ENTER_BEHAVIOR
+    if (this.plainEnter.getSnapshot() !== plainEnter) {
+      this.plainEnter.set(plainEnter)
+    }
   }
 }

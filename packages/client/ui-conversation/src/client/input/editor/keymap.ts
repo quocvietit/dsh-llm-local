@@ -1,10 +1,11 @@
 /**
  * Composer keymap over the Lexical command layer: menu arbitration
- * (arrows/escape/enter), space adjudication, the Enter submit gesture, and
- * paste routing. Registered at CRITICAL priority so it decides before
- * @lexical/plain-text's own Enter/paste defaults; a handler returning false
- * falls through to those defaults (Shift+Enter's line break, ordinary
- * spaces, text paste the bar routes itself).
+ * (arrows/escape/enter), space adjudication, the Enter submit/newline
+ * gesture, and paste routing. Registered at CRITICAL priority so it decides
+ * before @lexical/plain-text's own Enter/paste defaults; a handler returning
+ * false falls through to those defaults (Shift+Enter and unmodified Enter
+ * when the send-shortcut preference is newline, ordinary spaces, text paste
+ * the bar routes itself).
  *
  * IME guard: a composition-closing Enter/Space must not submit or adjudicate.
  * KeyboardEvent.isComposing covers most engines; Safari delivers the closing
@@ -19,6 +20,7 @@ import {
 } from 'lexical'
 import { mergeRegister } from '@lexical/utils'
 import type { ArbitrateKey, ArbitrateOutcome } from '../../contract/input.ts'
+import type { PlainEnterBehavior } from '../../contract/composer-submission.ts'
 
 /** The bar-supplied behavior behind each intercepted gesture. */
 export interface ComposerKeymapHandlers {
@@ -30,7 +32,9 @@ export interface ComposerKeymapHandlers {
   dismissPopup(): void
   /** Whether Enter may submit right now (locked/busy states refuse). */
   canSubmit(): boolean
-  /** The Enter gesture after every guard passed; `accelerated` = Ctrl/Cmd held. */
+  /** Live unmodified-Enter preference: newline vs send. */
+  plainEnter(): PlainEnterBehavior
+  /** The send gesture after every guard passed; `accelerated` = Ctrl/Cmd held. */
   submit(accelerated: boolean): void
   /** Pasted files (image intake). */
   intakeFiles(files: readonly File[]): void
@@ -43,6 +47,20 @@ function isComposingEvent(event: KeyboardEvent, recentlyComposing: () => boolean
   // keyCode 229 is the legacy IME-composition signal engines emit without isComposing.
   // oxlint-disable-next-line typescript/no-deprecated
   return event.isComposing || event.keyCode === 229 || recentlyComposing()
+}
+
+/**
+ * Whether this Enter keydown should submit instead of inserting a newline.
+ * Shift+Enter is always a newline. Ctrl/Cmd/Alt+Enter always send.
+ * Unmodified Enter follows the Settings preference.
+ * @param event - the keydown Lexical forwarded.
+ * @param plainEnter - live unmodified-Enter preference.
+ * @returns true when the keymap should submit.
+ */
+export function enterGestureSubmits(event: KeyboardEvent, plainEnter: PlainEnterBehavior): boolean {
+  if (event.shiftKey === true) return false
+  if (event.ctrlKey === true || event.metaKey === true || event.altKey === true) return true
+  return plainEnter === 'send'
 }
 
 /**
@@ -116,11 +134,12 @@ export function registerComposerKeymap(editor: LexicalEditor, handlers: Composer
         return true
       }
       // Menu-open Enter picks the highlight through arbitration; a
-      // no-highlight menu passes down to the submit gesture.
+      // no-highlight menu passes down to the submit/newline decision.
       if (handlers.arbitrate('enter', false) !== 'pass') {
         event?.preventDefault()
         return true
       }
+      if (event !== null && !enterGestureSubmits(event, handlers.plainEnter())) return false
       event?.preventDefault()
       if (event?.repeat === true) return true // held-down Enter must not machine-gun sends
       if (!handlers.canSubmit()) return true

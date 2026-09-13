@@ -179,6 +179,13 @@ const SERVICE_ROLES: ServiceRole[] = [
     note: 'Lists the Session composition\'s user-invocable skills without activating a cold Agent.',
   },
   {
+    key: 'skillLibrary',
+    pkg: 'host-skill-library',
+    title: 'Host skill-file library Remote',
+    mode: 'core',
+    note: 'Lists disk skills and mutates user and project SKILL.md files for the Web Settings library page.',
+  },
+  {
     key: 'credentialsController',
     pkg: 'api-settings-controller',
     title: 'Host credential-surface Remote controller',

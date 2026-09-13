@@ -265,6 +265,55 @@ Host service backing `ctx.remote.skills` without activating a cold Agent.
 
 Source: [`packages/api/session-controller/src/skill-catalog.ts`](../../packages/api/session-controller/src/skill-catalog.ts)
 
+<a id="ctxskilllibrary--skilllibrarygateway"></a>
+
+### `ctx.skillLibrary` — `SkillLibraryGateway`
+
+Remote service for the Settings skill library.
+
+```ts cordis-catalog
+/**
+ * List editable skills from the user and project roots, plus read-only registry skills.
+ * @param request - optional project workspace used to scan `.dsh/skills`.
+ * @param signal - caller lifetime; listing does not abort in-flight disk reads.
+ * @returns editable disk rows plus read-only registry rows.
+ */
+@Remote async list(request: SkillLibraryListRequest, signal: AbortSignal): Promise<SkillLibraryListValue>
+
+/**
+ * Load one skill body for the editor.
+ * @param request - name, location, and optional project workspace.
+ * @param signal - caller lifetime; unused by the disk read.
+ * @returns the catalog row plus Markdown body.
+ */
+@Remote async get(request: SkillLibraryGetRequest, signal: AbortSignal): Promise<SkillLibraryRecord>
+
+/**
+ * Create a directory-bundle skill under a writable root.
+ * @param request - name, description, body, and target location.
+ * @param signal - caller lifetime; unused by the disk write.
+ * @returns the created skill record.
+ */
+@Remote async create(request: SkillLibraryWriteRequest, signal: AbortSignal): Promise<SkillLibraryRecord>
+
+/**
+ * Replace the Markdown of an existing writable skill.
+ * @param request - name, description, body, and target location.
+ * @param signal - caller lifetime; unused by the disk write.
+ * @returns the updated skill record.
+ */
+@Remote async update(request: SkillLibraryWriteRequest, signal: AbortSignal): Promise<SkillLibraryRecord>
+
+/**
+ * Delete one writable skill file or bundle directory.
+ * @param request - name and location of the skill to remove.
+ * @param signal - caller lifetime; unused by the disk delete.
+ */
+@Remote async remove(request: SkillLibraryRemoveRequest, signal: AbortSignal): Promise<void>
+```
+
+Source: [`packages/host/skill-library/src/index.ts`](../../packages/host/skill-library/src/index.ts)
+
 <a id="ctxskills--skillregistry"></a>
 
 ### `ctx.skills` — `SkillRegistry`
