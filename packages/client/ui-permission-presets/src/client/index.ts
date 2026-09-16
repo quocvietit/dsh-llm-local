@@ -41,7 +41,7 @@ import type { PermissionSelectInjected } from './PermissionSelect.tsx'
 import { PermissionRow } from './PermissionRow.tsx'
 import type { PermissionRowInjected } from './PermissionRow.tsx'
 import {
-  accessEn, accessZh, en, PERMISSION_ACCESS_NS, zh,
+  accessEn, accessVi, accessZh, en, PERMISSION_ACCESS_NS, vi, zh,
 } from './locales.ts'
 import {
   AUTO_REVIEW_PRESET, displayPermissionPreset, FULL_ACCESS_PRESET,
@@ -141,7 +141,11 @@ export function apply(ctx: ClientContext): void {
     'ui-permission: dismiss stale slash choices',
   )
 
-  ctx.effect(() => ctx.locale.register('settings.permission', { zh, en }), 'ui-permission: settings row dictionaries')
+  ctx.effect(() => {
+    const dispose = ctx.locale.register('settings.permission', { zh, en })
+    const disposeVi = ctx.locale.register('settings.permission', 'vi', vi)
+    return () => { dispose(); disposeVi() }
+  }, 'ui-permission: settings row dictionaries')
 
   // The shared SettingsScope mirror updates after document commits and reconnects.
   const controller = new PermissionPresetSettingsController(

@@ -28,3 +28,17 @@ export const en = {
   'fontSize.increase': 'Increase font size',
   'fontSize.decrease': 'Decrease font size',
 } satisfies Record<ThemeKey, string>
+
+/** Vietnamese dictionary. */
+export const vi = {
+  'appearance.title': 'Giao diện',
+  'appearance.light': 'Sáng',
+  'appearance.dark': 'Tối',
+  'appearance.system': 'Hệ thống',
+  'fontSize.title': 'Cỡ chữ',
+  'fontSize.description': 'Chỉ ảnh hưởng nội dung hội thoại',
+  'fontSize.unit': 'px',
+  'fontSize.increase': 'Tăng cỡ chữ',
+  'fontSize.decrease': 'Giảm cỡ chữ',
+}
+

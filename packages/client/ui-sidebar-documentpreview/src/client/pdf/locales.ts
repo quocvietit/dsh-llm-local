@@ -27,6 +27,20 @@ export const en = {
   retry: 'Retry',
 } satisfies Record<PdfLocaleKey, string>
 
+/** Vietnamese dictionary. */
+export const vi = {
+  title: 'PDF',
+  pageImage: 'PDF trang {page}',
+  loading: 'Đang mở PDF…',
+  rendering: 'Đang vẽ trang…',
+  failed: 'Không hiển thị được PDF: {message}',
+  password: 'PDF này cần mật khẩu; chưa hỗ trợ xem trước có mật khẩu.',
+  workerFailed: 'Tiến trình render PDF không tiếp tục được. Hãy thử lại.',
+  unsupported: 'Xem trước PDF cần toàn bộ nội dung tệp.',
+  retry: 'Thử lại',
+}
+
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** PDF page, loading, and failure messages. */

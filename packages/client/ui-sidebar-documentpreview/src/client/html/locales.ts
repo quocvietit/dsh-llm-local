@@ -17,6 +17,15 @@ export const en = {
   failed: 'This HTML document could not be previewed.',
 } satisfies Record<HtmlPreviewKey, string>
 
+/** Vietnamese dictionary. */
+export const vi = {
+  title: 'HTML',
+  frame: 'Xem trước tài liệu HTML',
+  loading: 'Đang chuẩn bị xem trước HTML…',
+  failed: 'Không xem trước được tài liệu HTML này.',
+}
+
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** HTML preview selection and status text. */

@@ -48,3 +48,18 @@ export const en = {
   'time.months': '{n}mo',
   'time.years': '{n}y',
 } satisfies Record<ReferenceKey, string>
+
+/** Vietnamese dictionary. */
+export const vi = {
+  'section.files': 'Tệp và thư mục',
+  'section.sessions': 'Phiên',
+  'candidate.noCwd': '(no cwd)',
+  'crumb.root': 'Workspace',
+  'time.now': 'vừa xong',
+  'time.minutes': '{n} phút',
+  'time.hours': '{n} giờ',
+  'time.days': '{n} ngày',
+  'time.months': '{n} tháng',
+  'time.years': '{n} năm',
+}
+

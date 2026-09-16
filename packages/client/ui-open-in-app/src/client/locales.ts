@@ -65,5 +65,20 @@ export const en: Record<OpenInAppKey, string> = {
   'app.terminal': 'Terminal',
 }
 
+
+
+/** Vietnamese dictionary. */
+export const vi: Record<OpenInAppKey, string>  = {
+  'open.title': 'Open workspace in {app}',
+  'open.tooltip': 'Mở trên máy',
+  'open.error': 'Mở thất bại',
+  'menu.toggle': 'Choose an app to open in',
+  'menu.aria': 'Mở bằng',
+  ...PRODUCT_NAMES,
+  'app.finder': 'Finder',
+  'app.explorer': 'File Explorer',
+  'app.filemanager': 'Tệp',
+  'app.terminal': 'Terminal',
+}
 /** Key domain of the `open-in-app` namespace (zh is the source of truth). */
 export type OpenInAppKey = keyof typeof zh
