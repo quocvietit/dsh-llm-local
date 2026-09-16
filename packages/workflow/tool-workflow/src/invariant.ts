@@ -94,6 +94,9 @@ function applyEvent(trace: WorkflowTrace, event: SessionEvent, fail: InvariantFa
         fail('tool-workflow/agent-start phase must be a string when present')
       }
       stringId(data.childId, 'tool-workflow/agent-start childId', fail)
+      if (data.startedAt !== undefined && typeof data.startedAt !== 'string') {
+        fail('tool-workflow/agent-start startedAt must be a string when present')
+      }
       if (run.members.has(seq)) fail(`tool-workflow/agent-start repeats member seq ${seq} in run ${runId}`)
       run.members.set(seq, false)
       return
@@ -107,7 +110,20 @@ function applyEvent(trace: WorkflowTrace, event: SessionEvent, fail: InvariantFa
       const ended = run.members.get(seq)
       if (ended === undefined) fail(`tool-workflow/agent-end has no matching member seq ${seq} in run ${runId}`)
       if (ended) fail(`tool-workflow/agent-end repeats member seq ${seq} in run ${runId}`)
+      if (data.endedAt !== undefined && typeof data.endedAt !== 'string') {
+        fail('tool-workflow/agent-end endedAt must be a string when present')
+      }
       run.members.set(seq, true)
+      return
+    }
+    case 'tool-workflow/phase': {
+      openRun(trace, runId, event.type, fail)
+      if (typeof data.title !== 'string') fail('tool-workflow/phase title must be a string')
+      return
+    }
+    case 'tool-workflow/log': {
+      openRun(trace, runId, event.type, fail)
+      if (typeof data.message !== 'string') fail('tool-workflow/log message must be a string')
       return
     }
     case 'tool-workflow/run-end': {

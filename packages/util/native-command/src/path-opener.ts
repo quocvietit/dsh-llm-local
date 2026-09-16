@@ -9,6 +9,7 @@
  * @module @deepseek-ai/dsh-native-command/path-opener
  */
 
+import { writeFileSync } from 'node:fs'
 import { release as osRelease } from 'node:os'
 import { dirname, extname } from 'node:path'
 import { pathToFileURL } from 'node:url'
@@ -108,6 +109,61 @@ async function openWindowsPath(path: string, signal: AbortSignal, run: PathOpene
   ], signal)
 }
 
+/** Docker-on-Windows helper that opens the bind-mounted path on the host desktop. */
+function hostOpenQueue(env: NodeJS.ProcessEnv): string | undefined {
+  const queue = env.DSH_HOST_OPEN_QUEUE
+  return queue !== undefined && queue !== '' ? queue : undefined
+}
+
+/** Longest-prefix map of container paths onto Windows host paths (`from=to;...`). */
+function mapDockerPathToHost(containerPath: string, env: NodeJS.ProcessEnv): string {
+  const map = env.DSH_HOST_PATH_MAP
+  if (map === undefined || map === '') return containerPath
+  let bestFrom = ''
+  let bestTo = ''
+  for (const raw of map.split(';')) {
+    const entry = raw.trim()
+    const at = entry.indexOf('=')
+    if (at <= 0) continue
+    const from = entry.slice(0, at)
+    const to = entry.slice(at + 1)
+    if (containerPath === from || containerPath.startsWith(`${from}/`)) {
+      if (from.length >= bestFrom.length) {
+        bestFrom = from
+        bestTo = to
+      }
+    }
+  }
+  if (bestFrom === '') return containerPath
+  const rest = containerPath.slice(bestFrom.length).replaceAll('/', '\\')
+  const base = bestTo.replace(/[/\\]+$/u, '').replaceAll('/', '\\')
+  return rest === '' ? base : `${base}${rest}`
+}
+
+/**
+ * Ask a loopback helper on the Docker host to open or reveal a mapped path.
+ * Writes a bind-mounted queue file; the Windows helper polls it (the sandbox
+ * network is internal, so host.docker.internal is unreachable).
+ * @returns true when a queue path is configured and the request was written.
+ */
+function openViaDockerHost(
+  containerPath: string,
+  action: 'open' | 'reveal',
+  signal: AbortSignal,
+  env: NodeJS.ProcessEnv,
+): Promise<boolean> {
+  const queue = hostOpenQueue(env)
+  if (queue === undefined) return Promise.resolve(false)
+  signal.throwIfAborted()
+  const body = `${JSON.stringify({
+    path: mapDockerPathToHost(containerPath, env),
+    action,
+    at: Date.now(),
+  })}\n`
+  writeFileSync(queue, body, { encoding: 'utf8' })
+  return Promise.resolve(true)
+}
+
 /** Translate a WSL path before handing it to the Windows desktop. */
 async function openWslPath(path: string, signal: AbortSignal, run: PathOpenerRunner): Promise<void> {
   const translated = await run('wslpath', ['-w', path], signal)
@@ -128,6 +184,8 @@ async function openNativePathWithIntent(
   const run = internals.run ?? runNativeCommand
   const env = internals.env ?? process.env
   const wsl = platform === 'linux' && isWsl(internals)
+
+  if (await openViaDockerHost(path, 'open', signal, env)) return
 
   if (!wsl && intent === 'default' && BROWSER_DOCUMENTS.has(extname(path).toLowerCase())
     && await openInBrowser(path, signal, platform, run, env)) return
@@ -171,6 +229,7 @@ export function canOpenNativePath(internals: PathOpenerInternals = {}): boolean 
   if (platform !== 'linux') return false
   const env = internals.env ?? process.env
   return isWsl(internals) || present(env.DISPLAY) || present(env.WAYLAND_DISPLAY)
+    || hostOpenQueue(env) !== undefined
 }
 
 /**
@@ -215,6 +274,7 @@ export function nativeFileManager(internals: PathOpenerInternals = {}): NativeFi
   const platform = internals.platform ?? process.platform
   if (platform === 'darwin') return 'finder'
   if (platform === 'win32' || (platform === 'linux' && isWsl(internals))) return 'explorer'
+  if (hostOpenQueue(internals.env ?? process.env) !== undefined) return 'explorer'
   return platform === 'linux' ? 'directory' : null
 }
 
@@ -231,6 +291,8 @@ export async function revealNativePath(
   signal.throwIfAborted()
   const platform = internals.platform ?? process.platform
   const run = internals.run ?? runNativeCommand
+  const env = internals.env ?? process.env
+  if (await openViaDockerHost(path, 'reveal', signal, env)) return
   const manager = nativeFileManager({ ...internals, platform })
   if (manager === 'finder') {
     await run('open', ['-R', path], signal)

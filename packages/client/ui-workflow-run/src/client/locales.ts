@@ -23,6 +23,13 @@ export const zh = {
   'status.failed': '失败',
   'status.cancelled': '已取消',
   'status.interrupted': '已中断',
+  'filter.all': '全部',
+  'filter.running': '运行中',
+  'filter.completed': '已完成',
+  'board.counts': '运行中 {running} · 已完成 {completed}',
+  'member.time': '{time}',
+  'logs.title': '日志',
+  'logs.empty': '暂无日志',
 }
 
 /** English dictionary (same key set). */
@@ -45,6 +52,13 @@ export const en: Record<WorkflowRunKey, string> = {
   'status.failed': 'Failed',
   'status.cancelled': 'Cancelled',
   'status.interrupted': 'Interrupted',
+  'filter.all': 'All',
+  'filter.running': 'Running',
+  'filter.completed': 'Completed',
+  'board.counts': 'Running {running} · Completed {completed}',
+  'member.time': '{time}',
+  'logs.title': 'Log',
+  'logs.empty': 'No log lines',
 }
 
 
@@ -69,6 +83,13 @@ export const vi: Record<WorkflowRunKey, string>  = {
   'status.failed': 'Thất bại',
   'status.cancelled': 'Cancelled',
   'status.interrupted': 'Bị gián đoạn',
+  'filter.all': 'Tất cả',
+  'filter.running': 'Đang chạy',
+  'filter.completed': 'Đã xong',
+  'board.counts': 'Đang chạy {running} · Đã xong {completed}',
+  'member.time': '{time}',
+  'logs.title': 'Nhật ký',
+  'logs.empty': 'Chưa có nhật ký',
 }
 /** Union of this namespace's dictionary keys. */
 export type WorkflowRunKey = keyof typeof zh

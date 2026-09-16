@@ -460,10 +460,13 @@
   disabled: true
 
 - id: workflow-worker-thread
-  disabled: true
+  config:
+    provider: spawn
+    maxConcurrentAgents: 8
+    maxTotalAgents: 64
 
 - id: tool-workflow
-  disabled: true
+  disabled: false
 
 - id: tool-ralph
   disabled: true

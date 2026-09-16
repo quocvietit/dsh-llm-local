@@ -25,6 +25,7 @@ describe('keymap keydown routing', () => {
     const unregister = registerComposerKeymap(editor, {
       arbitrate: () => 'pass', space: () => false, dismissPopup: () => {},
       canSubmit: () => false, submit: () => {}, intakeFiles: () => {}, pasteText: () => {},
+      plainEnter: () => 'newline',
     })
     onTestFinished(unregister)
     fireEvent.compositionStart(first)

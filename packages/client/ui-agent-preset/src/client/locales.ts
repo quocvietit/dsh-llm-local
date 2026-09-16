@@ -126,6 +126,7 @@ export const vi: Record<AgentPresetSettingsKey, string>  = {
   displayName: 'Tên',
   displayNamePlaceholder: 'Shown in the picker; defaults to the identifier',
   inUse: 'Đang dùng',
+  selectionOffDefault: 'Mặc định',
   builtInGroup: 'Có sẵn',
   customGroup: 'Tùy chỉnh',
   noDescription: 'Không có mô tả.',
@@ -155,6 +156,12 @@ export const vi: Record<AgentPresetSettingsKey, string>  = {
     'The preset directory is deleted. Sessions already running on it keep working; new sessions cannot select it.',
   deleteConfirm: 'Xóa',
   deleting: 'Đang xóa…',
+  showPicker: 'Cho phép đổi chế độ Agent',
+  showPickerBeta: 'Beta',
+  showPickerDescription:
+    'When enabled, new tasks can choose Standard, PTC, Creator, Minimal, and custom modes. When disabled, all new tasks use the default mode (Standard by default; configurable). Only affects new tasks.',
+  enablePickerToSetDefault: 'Bật chọn chế độ Agent để đặt mặc định',
+  enablePickerToCreate: 'Bật chọn chế độ Agent để dùng Creator',
 }
 /** Simplified Chinese copy. */
 export const zh: Record<AgentPresetSettingsKey, string> = {

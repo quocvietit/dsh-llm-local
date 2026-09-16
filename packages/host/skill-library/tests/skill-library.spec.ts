@@ -100,7 +100,7 @@ describe('SkillLibraryGateway', () => {
     expect(updated.body).toBe('Updated body')
     expect(changes).toHaveLength(2)
 
-    await library.delete({ name: 'draft-review', location: 'user' }, unused))
+    await library.delete({ name: 'draft-review', location: 'user' }, unused)
     expect((await library.list({}, unused)).skills).toEqual([])
     expect(changes).toHaveLength(3)
   })
