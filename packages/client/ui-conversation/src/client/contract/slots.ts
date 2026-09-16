@@ -313,7 +313,6 @@ export interface ComposerBarInjected {
   retryFileUpload: ((id: DraftAttachmentId) => void) | undefined
   toggleCommandMenu: ((selection: EditSelection) => void) | undefined
   stop: (() => void) | undefined
-  command: ((line: string) => Promise<boolean>) | undefined
   hooks: {
     /**
      * Live busy-state submission preference: the delivery mode a send

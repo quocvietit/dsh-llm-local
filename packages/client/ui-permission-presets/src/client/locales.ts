@@ -102,6 +102,8 @@ export const accessEn = {
 
 /** Vietnamese dictionary for the current-session popup gate. */
 export const accessVi = {
+  'mode': 'Chế độ quyền, hiện tại: {name}',
+  'close': 'Đóng',
   'preset.readOnly': 'Chỉ xem',
   'preset.workspaceWrite': 'Ghi trong workspace',
   'preset.fullAccess': 'Toàn quyền',
@@ -110,4 +112,11 @@ export const accessVi = {
   'confirm.acknowledge': 'Tôi hiểu rủi ro và muốn tiếp tục',
   'confirm.cancel': 'Hủy',
   'confirm.enable': 'Bật toàn quyền',
+  'auto.label': 'Auto review',
+  'auto.badge': 'EXP',
+  'auto.description': 'Chạy không sandbox sau khi cùng một mô hình xem xét thử nghiệm mỗi lần gọi công cụ native và lời gọi PTC bên trong.',
+  'auto.confirm.title': 'Bật Auto review (thử nghiệm)?',
+  'auto.confirm.description': 'Auto review chạy không sandbox. Trước mỗi lần gọi công cụ native và lời gọi PTC bên trong, mô hình của agent hiện tại xem xét có cho phép hay không. Tính năng này vẫn thử nghiệm, có thể cho phép hoặc từ chối nhầm, và tốn thêm token.',
+  'auto.confirm.acknowledge': 'Tôi hiểu những rủi ro này và muốn tiếp tục',
+  'auto.confirm.enable': 'Bật Auto review',
 } satisfies Record<PermissionAccessKey, string>

@@ -34,8 +34,6 @@ export const vi = {
   'unknown': 'Không rõ',
   'none': 'Không có',
   'truncated': 'Đã cắt bớt',
-  'json.collapseNode': 'Thu gọn nút JSON',
-  'json.expandNode': 'Mở rộng nút JSON',
   'json.label': 'JSON',
   'markdown.footnotes': 'Chú thích',
   'markdown.truncatedCharacters': '… đã cắt bớt, tổng {total} ký tự',
