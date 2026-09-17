@@ -24,10 +24,13 @@ import { createModelsOperations } from './operations.ts'
 import { createSettingsSchemaOperations } from './schema-operations.ts'
 import { en, zh, type ModelsKey } from './locales.ts'
 import { WELCOME_NOTICE_SETTINGS_NAMESPACE } from '../onboarding-copy.ts'
+import type { Config as ModelsPluginConfig } from '../config.ts'
 
 export type { ModelsSectionInjected, ModelsSectionProps } from './ModelsSection.tsx'
 export type { ModelsFooterOwnerProps, ProviderCardExtrasOwnerProps } from './slot-contract.ts'
 export type { ModelsKey } from './locales.ts'
+export { Config } from '../config.ts'
+export type { ModelsPluginConfig }
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -68,8 +71,10 @@ export const inject = [
  * the ledger, wire its store to the connection, and keep it fresh on every
  * pushed invalidation (settings, credentials, or provider topology).
  * @param ctx - client root context.
+ * @param config - overlay knobs (`catalogAdd` to restore shipped-provider add).
  */
-export function apply(ctx: ClientContext): void {
+export function apply(ctx: ClientContext, config: ModelsPluginConfig = {}): void {
+  const catalogAdd = config.catalogAdd === true
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
     return () => { dispose() }
@@ -89,6 +94,7 @@ export function apply(ctx: ClientContext): void {
     operations,
     schema,
     t,
+    catalogAdd,
   })
   // The scope's own memory mode is what keeps a remote browser process-local,
   // so the store needs no isLoopback branch of its own.

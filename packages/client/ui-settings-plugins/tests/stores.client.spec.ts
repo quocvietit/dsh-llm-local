@@ -16,6 +16,7 @@ import { ConfigurablePluginsTabController } from '../src/client/tab-store.ts'
 import {
   SubagentModelSelectionCardController,
   subagentModelCandidates,
+  userAddedCatalogGroups,
   type SubagentModelSelectionSettings,
 } from '../src/client/subagent-model-selection-card-controller.ts'
 import { WebSearchCardController, type WebSearchSettings } from '../src/client/web-search-card-controller.ts'
@@ -68,13 +69,30 @@ function modelsApi(options: {
   }[]
   failures?: readonly { id: string; name: string; message: string }[]
   error?: string
+  directory?: readonly { provider: string; declared?: boolean }[]
 } = {}) {
   const models = vi.fn(() => Promise.resolve({
     ...(options.error === undefined
       ? { ok: true as const, value: { groups: options.groups ?? [], failures: options.failures ?? [] } }
       : { ok: false as const, error: new RemoteError('gateway/internal', options.error, {}) }),
   }))
-  return { ctx: ctxWith({ session: { modelCatalog: models } }), models }
+  const namespaces: Record<string, unknown> = { session: { modelCatalog: models } }
+  const directory = options.directory
+  if (directory !== undefined) {
+    namespaces.llm = {
+      listConfigurableProviders: vi.fn(() => Promise.resolve({
+        ok: true as const,
+        value: directory.map(entry => ({
+          provider: entry.provider,
+          displayName: entry.provider,
+          settingsNs: 'llm-pi-ai',
+          settingsPath: ['providers', entry.provider],
+          declared: entry.declared,
+        })),
+      })),
+    }
+  }
+  return { ctx: ctxWith(namespaces), models }
 }
 
 function deferred<T>() {
@@ -434,6 +452,47 @@ describe('AgentLoopCardController', () => {
 })
 
 describe('SubagentModelSelectionCardController', () => {
+  it('keeps only hand-declared providers when a configurable directory is present', () => {
+    expect(userAddedCatalogGroups(
+      [
+        { id: 'openai', name: 'OpenAI', models: [{ id: 'gpt-5-mini', name: 'GPT-5 mini' }] },
+        { id: 'acme', name: 'Acme', models: [{ id: 'fast', name: 'Fast' }] },
+      ],
+      [
+        { provider: 'openai', declared: false },
+        { provider: 'acme', declared: true },
+      ],
+    )).toEqual([
+      { id: 'acme', name: 'Acme', models: [{ id: 'fast', name: 'Fast' }] },
+    ])
+  })
+
+  it('hides shipped catalog models from the subagent allowlist', async () => {
+    const host = stubSettingsScope<SubagentModelSelectionSettings>()
+    const models = modelsApi({
+      groups: [
+        { id: 'openai', name: 'OpenAI', models: [{ id: 'gpt-5-mini', name: 'GPT-5 mini' }] },
+        { id: 'acme', name: 'Acme', models: [{ id: 'fast', name: 'Fast' }] },
+      ],
+      directory: [
+        { provider: 'openai', declared: false },
+        { provider: 'acme', declared: true },
+      ],
+    })
+    const controller = new SubagentModelSelectionCardController(host.scope, models.ctx)
+    host.publish({
+      status: 'ready', writable: true, revision: 1,
+      value: { enabled: true, allowedModels: [] }, user: {},
+    })
+    const face = controller.inject()
+    await vi.waitFor(() => {
+      expect(face.hooks.subagentModelSelectionCard.getSnapshot().catalogStatus).toBe('ready')
+    })
+    expect(face.hooks.subagentModelSelectionCard.getSnapshot().candidates).toEqual([
+      expect.objectContaining({ key: 'acme\0fast', available: true }),
+    ])
+  })
+
   it('joins stored routes with the live catalog without dropping unavailable choices', () => {
     const candidates = subagentModelCandidates(
       [{ id: 'alpha', name: 'Alpha API', models: [{ id: 'fast', name: 'Fast' }] }],

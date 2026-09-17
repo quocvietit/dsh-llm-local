@@ -1,12 +1,11 @@
 /**
  * Browser-side locale registry. Bound translation functions retain stable
- * identity for injected consumers. The plugin also registers the Language
- * preference row into the settings General section — the locale feature owns
- * its own settings surface.
+ * identity for injected consumers. This deployment does not register the
+ * Language settings row; locale still follows the browser and settings.yaml.
  */
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import {
-  type BoundActions, type LocaleDictOf, type LocaleNamespaceMap, type Translate, type TranslateNS,
+  type LocaleDictOf, type LocaleNamespaceMap, type Translate, type TranslateNS,
 } from '@deepseek-ai/dsh-client-ui-slots'
 // Type-only: the ctx.settingsScope Context merge and the settings slot types.
 // Cross-plugin collaboration goes through the service, never a value import
@@ -22,9 +21,6 @@ import { en, zh, type CommonKey } from '../locales/index.ts'
 import {
   en as settingsEn, zh as settingsZh, type SettingsLocaleKey,
 } from '../locales/settings.ts'
-import type { LanguageRowInjected } from './LanguageRow.tsx'
-import { LanguageRow } from './LanguageRow.tsx'
-import { createLanguageRowStore } from './settings-store.ts'
 
 export type { LanguageRowComponentProps, LanguageRowInjected } from './LanguageRow.tsx'
 export type { LanguageOptionRow, LanguageRowState } from './settings-store.ts'
@@ -533,9 +529,8 @@ function detectBrowserLocale(locales: readonly LocaleDefinition[]): LocaleId | u
 export const inject = ['slots', 'remote', 'settingsScope']
 
 /**
- * Client plugin body: provide the locale service with base dictionaries and
- * register the feature-owned Language preference row into the General
- * section's item slot (a feature owns its settings surface).
+ * Client plugin body: provide the locale service with base dictionaries.
+ * The Language settings row is omitted in this deployment.
  * @param ctx - client cordis context.
  */
 export function apply(ctx: ClientContext): void {
@@ -548,37 +543,7 @@ export function apply(ctx: ClientContext): void {
   // so the render machinery can synthesize the `t` standard seat.
   ctx.slots.installLocale(locale)
 
-  const store = createLanguageRowStore()
-  let bound: BoundActions<typeof store> | undefined
-  const sync = (): void => {
-    const snapshot = locale.getSnapshot()
-    syncDocumentLanguage(snapshot)
-    bound?.sync(
-      snapshot.active,
-      snapshot.locales.map(l => ({ id: l.id, label: l.label })),
-      snapshot.revision,
-    )
-  }
-  ctx.effect(() => locale.subscribe(sync), 'locale: language row and document synchronization')
-  // The served markup declares one language; the resolved locale may differ
-  // (browser detection, or a stored preference adopted after activation), so
-  // state it once at activation rather than waiting for the first change.
+  const sync = (): void => { syncDocumentLanguage(locale.getSnapshot()) }
+  ctx.effect(() => locale.subscribe(sync), 'locale: document language synchronization')
   sync()
-  const injected = (actions: BoundActions<typeof store>): LanguageRowInjected => {
-    bound = actions
-    // Re-sync from the getter so no event is lost between registration and
-    // first render (the store's revision guard drops stale duplicates).
-    sync()
-    return {
-      setLocale: (id) => { locale.setLocale(id) },
-    }
-  }
-  ctx.slots.inject('settings.general.item', () => ctx.slots.register({
-    name: 'settings.general.item',
-    id: 'language',
-    order: 0,
-    store,
-    locale: SETTINGS_NS,
-    inject: injected,
-  }, LanguageRow))
 }

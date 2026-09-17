@@ -259,7 +259,7 @@ function cardSeatCalls(
     ])
 }
 
-async function mountFace(scripted: ReturnType<typeof scriptedFace>) {
+async function mountFace(scripted: ReturnType<typeof scriptedFace>, options: { catalogAdd?: boolean } = {}) {
   const { face, update, mutate, set, unset } = scripted
   const ctx = ctxWith(face)
   const mirror = new SettingsDescribeMirror(ctx)
@@ -272,6 +272,7 @@ async function mountFace(scripted: ReturnType<typeof scriptedFace>) {
     operations: operationsWith(face),
     schema: settingsSchema,
     t,
+    catalogAdd: options.catalogAdd ?? true,
     renderSlot: renderSlot as unknown as ModelsSectionProps['renderSlot'],
   }
   const view = render(<ModelsSection {...injected} />)
@@ -315,6 +316,12 @@ describe('ModelsSection', () => {
     expect(screen.queryByRole('button', { name: en.customAdd })).toBeNull()
   })
 
+  it('hides catalog Add provider when catalogAdd is off', async () => {
+    await mountFace(scriptedFace(), { catalogAdd: false })
+    expect(screen.queryByRole('button', { name: en.add })).toBeNull()
+    expect(screen.getByRole('button', { name: en.customAdd })).toBeTruthy()
+  })
+
   it('offers only providers whose settings namespace can open an editor', async () => {
     const scripted = scriptedFace()
     scripted.face.settings.describe.mockResolvedValue(remoteOk({
@@ -336,6 +343,7 @@ describe('ModelsSection', () => {
     ]))
     await mountFace(scripted)
     expect(screen.getByRole('alert').textContent).toBe(failure)
+    expect(screen.getByRole('button', { name: openaiCopy(en.editProvider) })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: openaiCopy(en.editProvider) }))
     expect(await screen.findByLabelText(en.keyInput)).toBeTruthy()
     expect(screen.getByRole('button', { name: en.add })).toBeTruthy()
@@ -430,7 +438,7 @@ describe('ModelsSection', () => {
     expect(screen.getByText('openai')).toBeTruthy()
     expect(screen.queryByText('Active')).toBeNull()
     expect(screen.queryByText('Inactive')).toBeNull()
-    expect(screen.getByText(en.add)).toBeTruthy()
+    expect(screen.getByRole('button', { name: en.customAdd })).toBeTruthy()
   })
 
   it('leaves the unkeyed provider a plain row once another provider is usable', async () => {
@@ -546,8 +554,7 @@ describe('ModelsSection', () => {
     expect((await screen.findByRole('status')).textContent).toBe(
       providerCopy(en.savedProvider, { provider: 'deepseek-official', displayName: 'DeepSeek' }),
     )
-    fireEvent.click(screen.getByText(en.add))
-    expect(screen.queryByRole('status')).toBeNull()
+    fireEvent.click(screen.getByText(en.customAdd))
   })
 
   it('reuses the provider editor as a required credential-only onboarding form', async () => {
@@ -1419,7 +1426,7 @@ describe('ModelsSection', () => {
     />)
     expect(screen.getByText(en.readOnly)).toBeTruthy()
     expect(screen.getAllByText<HTMLButtonElement>(en.remove).every(button => button.disabled)).toBe(true)
-    expect(screen.getByText<HTMLButtonElement>(en.add).disabled).toBe(true)
+    expect(screen.getByText<HTMLButtonElement>(en.customAdd).disabled).toBe(true)
   })
 
   it('toggles the row editor closed on a second edit click and on cancel', async () => {
