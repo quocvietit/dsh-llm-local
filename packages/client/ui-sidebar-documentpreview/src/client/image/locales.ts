@@ -18,17 +18,6 @@ export const en = {
   failed: 'This image could not be displayed.',
   unsupported: 'Image preview requires the complete file contents.',
 } satisfies Record<ImagePreviewKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  title: 'Ảnh',
-  preview: 'Xem trước ảnh: {name}',
-  loading: 'Đang mở ảnh…',
-  failed: 'Không hiển thị được ảnh này.',
-  unsupported: 'Xem trước ảnh cần toàn bộ nội dung tệp.',
-}
-
-
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Image preview selection, accessible name, and status text. */

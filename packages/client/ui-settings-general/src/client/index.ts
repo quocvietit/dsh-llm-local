@@ -29,7 +29,7 @@ import { GeneralSection } from './GeneralSection.tsx'
 import { SettingsDocumentAction } from './SettingsDocumentAction.tsx'
 import type { SettingsDocumentActionInjected } from './SettingsDocumentAction.tsx'
 import { SettingsDocumentStore } from './settings-document-store.ts'
-import { en, vi, zh, type SettingsKey } from './locales.ts'
+import { en, zh, type SettingsKey } from './locales.ts'
 
 export type {
   CloseLabelProps, HeaderContentProps, TriggerContentProps,
@@ -67,8 +67,7 @@ export const inject = ['slots', 'locale', 'connection', 'remote', 'remote.settin
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-settings-general: dictionaries')
   const connection = ctx.get('connection') as ConnectionHandle
 

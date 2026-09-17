@@ -7,7 +7,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type {} from '@deepseek-ai/dsh-schedule/client'
 import { ScheduleCatalogAction } from './ScheduleCatalogAction.tsx'
-import { en, vi, NS, zh, type ScheduleCatalogKey } from './locales.ts'
+import { en, NS, zh, type ScheduleCatalogKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -23,8 +23,7 @@ export const inject = ['slots', 'locale']
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-schedule: dictionaries')
   ctx.slots.inject(
     'conversation.session.header.actions',

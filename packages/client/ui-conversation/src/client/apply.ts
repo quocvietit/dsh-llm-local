@@ -36,7 +36,7 @@ import { ConversationSession, ConversationSessionHeader } from './skeleton/Conve
 import { InputBar } from './skeleton/InputBar.tsx'
 import { todoDockEntry } from './skeleton/TodoPanel.tsx'
 import { resolveActiveView } from './view-selection.ts'
-import { en, vi, NS, zh, type ConversationKey } from './locales.ts'
+import { en, NS, zh, type ConversationKey } from './locales.ts'
 import { CONVERSATION_SETTINGS_NAMESPACE, type ConversationSettings } from '../submission-settings.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
@@ -138,8 +138,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
 
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-conversation: dictionaries')
   const t = ctx.locale.bind(NS)
   const conversationStore = createConversationStore()

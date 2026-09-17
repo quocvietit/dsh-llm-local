@@ -18,9 +18,9 @@ import {
   LOCALE_ID_PATTERN, LOCALE_IDS, LOCALE_PREFERENCE_FIELD, LOCALE_SETTINGS_NAMESPACE,
   type BuiltInLocaleId, type LocaleId, type LocaleSettings,
 } from '../locale-settings.ts'
-import { en, vi, zh, type CommonKey } from '../locales/index.ts'
+import { en, zh, type CommonKey } from '../locales/index.ts'
 import {
-  en as settingsEn, vi as settingsVi, zh as settingsZh, type SettingsLocaleKey,
+  en as settingsEn, zh as settingsZh, type SettingsLocaleKey,
 } from '../locales/settings.ts'
 import type { LanguageRowInjected } from './LanguageRow.tsx'
 import { LanguageRow } from './LanguageRow.tsx'
@@ -148,9 +148,7 @@ function syncDocumentLanguage(snapshot: LocaleSnapshot): void {
   if (typeof document === 'undefined') return
   document.documentElement.lang = snapshot.active === 'zh'
     ? 'zh-CN'
-    : snapshot.active === 'vi'
-      ? 'vi-VN'
-      : snapshot.active
+    : snapshot.active
 }
 
 /**
@@ -543,11 +541,8 @@ export const inject = ['slots', 'remote', 'settingsScope']
 export function apply(ctx: ClientContext): void {
   const host = ctx.settingsScope.bind<LocaleSettings>({ namespace: LOCALE_SETTINGS_NAMESPACE })
   const locale = new LocaleRuntime(ctx, host)
-  locale.addLanguage({ id: 'vi', label: 'Tiếng Việt', fallback: 'en' })
   locale.register(COMMON_NS, { zh, en })
-  locale.register(COMMON_NS, 'vi', vi)
   locale.register(SETTINGS_NS, { zh: settingsZh, en: settingsEn })
-  locale.register(SETTINGS_NS, 'vi', settingsVi)
   ctx.provide('locale', locale)
   // The service IS the LocaleFace (bind + getSnapshot/subscribe): install it
   // so the render machinery can synthesize the `t` standard seat.

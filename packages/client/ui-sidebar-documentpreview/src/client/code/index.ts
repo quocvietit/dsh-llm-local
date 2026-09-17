@@ -3,7 +3,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import type {} from '../index.ts'
 import { CodeBody } from './CodeBody.tsx'
 import { CODE_EXTENSIONS } from './languages.ts'
-import { en, vi, zh } from './locales.ts'
+import { en, zh } from './locales.ts'
 
 const ID = '@deepseek-ai/dsh-client-ui-sidebar-documentpreview/code'
 const NS = 'sidebarCodePreview'
@@ -12,8 +12,7 @@ const NS = 'sidebarCodePreview'
 export function apply(ctx: Context): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   })
   const t = ctx.locale.bind(NS)
   ctx.effect(() => ctx.documentPreviews.register({

@@ -58,29 +58,3 @@ export const en = {
   'tab.guide.title': 'Start',
   'tab.unavailable': 'Nothing here can view this kind of content yet.',
 } satisfies Record<SidebarRightKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'chrome.expand': 'Mở thanh bên',
-  'chrome.expandAria': 'Open right sidebar',
-  'chrome.collapse': 'Thu gọn thanh bên',
-  'chrome.collapseAria': 'Collapse right sidebar',
-  'chrome.toFullscreen': 'Toàn màn hình',
-  'chrome.exitFullscreen': 'Thoát toàn màn hình',
-  'dock.emptyPane': 'Empty pane',
-  'dock.splitPane': 'Chia cột',
-  'dock.splitPaneDisabled': 'Tối đa hai ngăn',
-  'dock.splitPaneNarrow': 'Chưa đủ rộng để tách; hãy nới thanh bên',
-  'dock.closeTab': 'Đóng',
-  'dock.addTab': 'Thẻ mới',
-  'dock.dockFloat': 'Gửi lại thanh bên',
-  'dock.closeFloat': 'Đóng',
-  'dock.drop.center': 'Move here',
-  'dock.drop.left': 'Add left split',
-  'dock.drop.right': 'Add right split',
-  'dock.drop.top': 'Add top split',
-  'dock.drop.bottom': 'Add bottom split',
-  'tab.guide.title': 'Bắt đầu',
-  'tab.unavailable': 'Chưa có gì ở đây xem được loại nội dung này.',
-}
-

@@ -10,7 +10,7 @@ import {
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
-import { en, vi, NS, zh, type SubagentKey } from './locales.ts'
+import { en, NS, zh, type SubagentKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -51,8 +51,7 @@ function selectReadOnlySubagent(owner: ComposerChainProps): SubagentReadOnlyMatc
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-subagent: dictionaries')
   const sessions = ctx.sessions
   const catalogActions = (_parentSessionId: SessionId): SubagentCatalogInjected => ({

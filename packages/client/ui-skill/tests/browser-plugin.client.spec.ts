@@ -143,10 +143,6 @@ describe('apply', () => {
           'menu.userOnly': 'user-only',
         },
       },
-    },
-    {
-      namespace: 'skill',
-      dictionaries: 'vi',
     }])
   })
 

@@ -32,17 +32,3 @@ export const en = {
   'crumbs.aria': 'Folder navigation',
   'suggestions.aria': 'Trigger suggestions',
 } satisfies Record<MenuKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'command': 'Lệnh',
-  'skill': 'Kỹ năng',
-  'subagent': 'Tác nhân con',
-  'loading': 'Đang tải…',
-  'drill.aria': 'Duyệt thư mục',
-  'drill.hint': 'Duyệt thư mục',
-  'drill.key': 'Tab',
-  'crumbs.aria': 'Điều hướng thư mục',
-  'suggestions.aria': 'Gợi ý kích hoạt',
-}
-

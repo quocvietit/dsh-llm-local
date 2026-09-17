@@ -54,20 +54,3 @@ export const en = {
   'error.notDirectory': 'That is not a directory.',
   'error.unavailable': 'Read failed: {message}',
 } satisfies Record<SidebarFilesKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'type.label': 'Tệp',
-  'guide.title': 'Tệp workspace',
-  loading: 'Đang đọc…',
-  empty: 'Thư mục trống',
-  truncated: 'Too many entries, showing only some of them.',
-  noWorkspace: 'This session has no workspace directory.',
-  reload: 'Tải lại',
-  'entry.other': 'Không phải tệp hay thư mục nên không mở được.',
-  'error.notFound': 'Thư mục đó không còn. Có thể đã bị chuyển hoặc xóa.',
-  'error.outsideWorkspace': 'Thư mục đó nằm ngoài workspace nên thanh bên sẽ không đọc.',
-  'error.notDirectory': 'Đó không phải thư mục.',
-  'error.unavailable': 'Đọc thất bại: {message}',
-}
-

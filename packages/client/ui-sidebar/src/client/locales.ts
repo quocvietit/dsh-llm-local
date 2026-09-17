@@ -20,13 +20,3 @@ export const en = {
   'toggle.collapse': 'Collapse sidebar',
   'panels.label': 'Global panels',
 } satisfies Record<SidebarKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'session.new': 'Phiên mới',
-  'session.new.label': 'Phiên mới',
-  'toggle.open': 'Mở thanh bên',
-  'toggle.collapse': 'Thu gọn thanh bên',
-  'panels.label': 'Bảng toàn cục',
-}
-

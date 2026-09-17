@@ -9,7 +9,7 @@ import type { TypertClientEventListener } from '@deepseek-ai/dsh-typert-protocol
 import type {} from '@deepseek-ai/dsh-client-locale/client'
 import { ApprovalPanel } from './ApprovalPanel.tsx'
 import { PendingApproval } from './contract/slots.ts'
-import { en, vi, zh } from './locales.ts'
+import { en, zh } from './locales.ts'
 
 export type {
   ApprovalComposerProps,
@@ -75,8 +75,7 @@ async function answerApproval(
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-approval: dictionaries')
   const registerPendingInteraction = ctx.uiSession.registerPendingInteraction<PendingApproval>(
     () => 0,

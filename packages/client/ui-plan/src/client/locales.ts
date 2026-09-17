@@ -22,14 +22,3 @@ export const en = {
   'chip.off.title': 'Plan mode off — click to turn on (/plan)',
   'chip.exitFailed': 'Failed to exit plan mode',
 } satisfies Record<PlanKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'chip.label': 'Kế hoạch',
-  'chip.on.aria': 'Plan mode on, press to turn off',
-  'chip.on.title': 'Chế độ kế hoạch đang bật — nhấp để tắt (/plan off)',
-  'chip.off.aria': 'Plan mode off, press to turn on',
-  'chip.off.title': 'Chế độ kế hoạch đang tắt — nhấp để bật (/plan)',
-  'chip.exitFailed': 'Không thoát được chế độ kế hoạch',
-}
-

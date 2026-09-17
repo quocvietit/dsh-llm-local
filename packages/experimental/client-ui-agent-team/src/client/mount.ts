@@ -16,7 +16,7 @@ import type { TypertRemoteContribution } from '@deepseek-ai/dsh-typert-protocol'
 import {
   TeamAction, type TeamActionInjected, type TeamActionResult, type TeamTaskActionResult,
 } from './TeamAction.tsx'
-import { en, vi, NS, zh, type TeamKey } from './locales.ts'
+import { en, NS, zh, type TeamKey } from './locales.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
@@ -31,8 +31,7 @@ export const inject = ['sessions', 'remote', 'slots', 'locale']
 function registerUi(ctx: ClientContext): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'client-ui-agent-team: dictionaries')
   const sessions = ctx.sessions
   const leadSessionId = (sessionId: SessionId): SessionId => {

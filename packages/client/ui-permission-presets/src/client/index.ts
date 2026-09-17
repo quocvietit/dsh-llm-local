@@ -41,7 +41,7 @@ import type { PermissionSelectInjected } from './PermissionSelect.tsx'
 import { PermissionRow } from './PermissionRow.tsx'
 import type { PermissionRowInjected } from './PermissionRow.tsx'
 import {
-  accessEn, accessVi, accessZh, en, PERMISSION_ACCESS_NS, vi, zh,
+  accessEn, accessZh, en, PERMISSION_ACCESS_NS, zh,
 } from './locales.ts'
 import {
   AUTO_REVIEW_PRESET, displayPermissionPreset, FULL_ACCESS_PRESET,
@@ -115,8 +115,7 @@ export function apply(ctx: ClientContext): void {
   const sessions = ctx.sessions
   ctx.effect(() => {
     const dispose = ctx.locale.register(PERMISSION_ACCESS_NS, { zh: accessZh, en: accessEn })
-    const disposeVi = ctx.locale.register(PERMISSION_ACCESS_NS, 'vi', accessVi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-permission: current-session dictionaries')
   const t = ctx.locale.bind(PERMISSION_ACCESS_NS)
   const sessionFor = (session: ClientSessionContext): SessionFace | undefined =>
@@ -144,8 +143,7 @@ export function apply(ctx: ClientContext): void {
 
   ctx.effect(() => {
     const dispose = ctx.locale.register('settings.permission', { zh, en })
-    const disposeVi = ctx.locale.register('settings.permission', 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-permission: settings row dictionaries')
 
   // The shared SettingsScope mirror updates after document commits and reconnects.

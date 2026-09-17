@@ -21,11 +21,3 @@ export const en = {
   copy: 'Copy',
   copied: 'Copied',
 } satisfies Record<keyof typeof zh, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  title: 'Mã',
-  copy: 'Sao chép',
-  copied: 'Đã sao chép',
-}
-

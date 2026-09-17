@@ -3,7 +3,7 @@ import type { Context } from '@deepseek-ai/cordis'
 import type {} from '../index.ts'
 import type { DocumentPreviewDefinition } from '../document/registry.ts'
 import { MarkdownBody } from './MarkdownBody.tsx'
-import { en, vi, zh } from './locales.ts'
+import { en, zh } from './locales.ts'
 
 /** Implementation identity shared by metadata and the document slot. */
 export const MARKDOWN_BODY_ID = '@deepseek-ai/dsh-client-ui-sidebar-documentpreview/markdown'
@@ -25,8 +25,7 @@ export function apply(ctx: Context): void {
   const t = ctx.locale.bind('documentMarkdown')
   ctx.effect(() => {
     const dispose = ctx.locale.register('documentMarkdown', { zh, en })
-    const disposeVi = ctx.locale.register('documentMarkdown', 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'document-markdown: dictionaries')
   ctx.effect(() => ctx.documentPreviews.register(markdownDefinition(() => t('viewer.label'))), 'document-markdown: metadata')
   ctx.effect(() => ctx.slots.inject('sidebar.right.tab.document', () => ctx.slots.register(

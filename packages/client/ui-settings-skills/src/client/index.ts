@@ -10,7 +10,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 import type {} from '@deepseek-ai/dsh-api-remotes/client'
 import { SkillsSection } from './SkillsSection.tsx'
 import type { SkillsSectionInjected } from './SkillsSection.tsx'
-import { en, vi, zh, type SkillsLocaleKey } from './locales.ts'
+import { en, zh, type SkillsLocaleKey } from './locales.ts'
 
 export type { SkillsSectionInjected, SkillsSectionProps, SkillWriteInput } from './SkillsSection.tsx'
 export type { SkillsLocaleKey } from './locales.ts'
@@ -35,8 +35,7 @@ export const inject = ['slots', 'locale', 'remote', 'remote.skillLibrary']
 export function apply(ctx: ClientContext): void {
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-settings-skills: dictionaries')
 
   const t = ctx.locale.bind(NS)
