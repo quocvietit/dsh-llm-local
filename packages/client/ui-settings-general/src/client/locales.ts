@@ -32,20 +32,3 @@ export const en = {
   'connection.reconnect': 'Disconnected, reconnect now',
   'connection.restart': 'Reconnecting, reconnect now',
 } satisfies Record<SettingsKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'trigger': 'Cài đặt',
-  'title': 'Cài đặt',
-  'close': 'Đóng',
-  'openDocument': 'Mở tệp cấu hình',
-  'openDocument.error': 'Không mở được tệp cấu hình',
-  'general.nav': 'Chung',
-  'connection.error': 'Mất kết nối',
-  'connection.retry': 'Kết nối lại ngay',
-  'connection.connecting': 'Đang kết nối lại',
-  'connection.connected': 'Đã kết nối',
-  'connection.reconnect': 'Mất kết nối, kết nối lại ngay',
-  'connection.restart': 'Đang tự kết nối lại, kết nối lại ngay',
-}
-

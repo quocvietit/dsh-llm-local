@@ -28,13 +28,15 @@ import { ComposerSubmissionPolicy } from './input/submission-policy.ts'
 import { queueDockEntry } from './queue/QueueDock.tsx'
 import { EnterBehaviorRow } from './settings/EnterBehaviorRow.tsx'
 import type { EnterBehaviorRowInjected } from './settings/EnterBehaviorRow.tsx'
+import { PlainEnterRow } from './settings/PlainEnterRow.tsx'
+import type { PlainEnterRowInjected } from './settings/PlainEnterRow.tsx'
 import { ConversationRoot } from './skeleton/ConversationRoot.tsx'
 import { ConversationPanel } from './skeleton/ConversationPanel.tsx'
 import { ConversationSession, ConversationSessionHeader } from './skeleton/ConversationSession.tsx'
 import { InputBar } from './skeleton/InputBar.tsx'
 import { todoDockEntry } from './skeleton/TodoPanel.tsx'
 import { resolveActiveView } from './view-selection.ts'
-import { en, vi, NS, zh, type ConversationKey } from './locales.ts'
+import { en, NS, zh, type ConversationKey } from './locales.ts'
 import { CONVERSATION_SETTINGS_NAMESPACE, type ConversationSettings } from '../submission-settings.ts'
 
 declare module '@deepseek-ai/dsh-client-ui-slots' {
@@ -136,8 +138,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
 
   ctx.effect(() => {
     const dispose = ctx.locale.register(NS, { zh, en })
-    const disposeVi = ctx.locale.register(NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-conversation: dictionaries')
   const t = ctx.locale.bind(NS)
   const conversationStore = createConversationStore()
@@ -145,6 +146,16 @@ export function apply(ctx: Context, config: Config = Config({})): void {
     ctx.settingsScope.bind<ConversationSettings>({ namespace: CONVERSATION_SETTINGS_NAMESPACE }),
   )
 
+  ctx.slots.inject('settings.general.item', () => ctx.slots.register({
+    name: 'settings.general.item',
+    id: 'composer-send-key',
+    order: 15,
+    locale: NS,
+    inject: (): PlainEnterRowInjected => ({
+      hooks: { plainEnter: submissionPolicy.plainEnter },
+      setPlainEnter: (behavior) => { submissionPolicy.setPlainEnter(behavior) },
+    }),
+  }, PlainEnterRow))
   ctx.slots.inject('settings.general.item', () => ctx.slots.register({
     name: 'settings.general.item',
     id: 'composer-enter',
@@ -345,6 +356,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
           stop: undefined,
           hooks: {
             busyEnter: submissionPolicy.busyEnter,
+            plainEnter: submissionPolicy.plainEnter,
             fileUploads: ABSENT_FILE_UPLOADS,
             notices: ABSENT_NOTICES,
             lexicon: ABSENT_LEXICON,
@@ -397,6 +409,7 @@ export function apply(ctx: Context, config: Config = Config({})): void {
         },
         hooks: {
           busyEnter: submissionPolicy.busyEnter,
+          plainEnter: submissionPolicy.plainEnter,
           fileUploads: conversation.fileUploads,
           notices: shell.notices,
           lexicon: shell.lexicon,

@@ -56,6 +56,28 @@ function readableMember(label: string, t: WorkflowRunPanelProps['t']): string {
   return label === '' ? t('member.empty') : label
 }
 
+function formatClock(iso: string | undefined): string | undefined {
+  if (iso === undefined || iso === '') return undefined
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return iso
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+}
+
+function memberVisible(member: WorkflowRunMemberData, filter: 'all' | 'running' | 'completed'): boolean {
+  if (filter === 'all') return true
+  if (filter === 'running') return member.status === 'running'
+  return member.status !== 'running'
+}
+
+function filterPhases(
+  phases: readonly WorkflowRunPhaseData[],
+  filter: 'all' | 'running' | 'completed',
+): WorkflowRunPhaseData[] {
+  return phases
+    .map(phase => ({ ...phase, members: phase.members.filter(member => memberVisible(member, filter)) }))
+    .filter(phase => phase.members.length > 0)
+}
+
 function statusCount(
   status: WorkflowRunStatus,
   count: number,
@@ -201,12 +223,14 @@ function navigableMembers(
   return result
 }
 
-function RunHeader({ children, count, name, onToggle, open, status, t }: {
+function RunHeader({ children, completedCount, count, name, onToggle, open, runningCount, status, t }: {
   readonly children: ReactNode
+  readonly completedCount: number
   readonly count: number
   readonly name: string
   readonly onToggle: () => void
   readonly open: boolean
+  readonly runningCount: number
   readonly status: WorkflowRunStatus
   readonly t: WorkflowRunPanelProps['t']
 }) {
@@ -226,6 +250,10 @@ function RunHeader({ children, count, name, onToggle, open, status, t }: {
         <>
           <span className={css.separator} aria-hidden />
           <span className={css.runSummary}>{memberCount(count, t)}</span>
+          <span className={css.runSummary}>{t('board.counts', {
+            running: String(runningCount),
+            completed: String(completedCount),
+          })}</span>
           <span className={css.statusTail} data-status={status}>
             <StateDot state={dotState(status)} />
             <span>{t(STATUS_KEYS[status])}</span>
@@ -253,6 +281,9 @@ function MemberRow({ member, navigable, openSession, t }: {
       <span className={css.dotSlot}><StateDot state={dotState(member.status)} /></span>
       <span className={css.memberLabelWrap} data-member-label-wrap><span className={css.memberLabel} data-member-label>{name}</span></span>
       <span className={css.memberStatus} data-member-status-text>{t(STATUS_KEYS[member.status])}</span>
+      {formatClock(member.endedAt ?? member.startedAt) === undefined
+        ? null
+        : <span className={css.memberTime}>{formatClock(member.endedAt ?? member.startedAt)}</span>}
     </>
   )
   if (!renderButton) {
@@ -331,14 +362,18 @@ function PhaseSection({
 
 /** Render one durable workflow run with status-driven run and phase disclosure. */
 export function WorkflowRunPanel({ node, sessionId, useSessions, openSession, t }: WorkflowRunPanelProps) {
-  const phaseFacts = useMemo(() => node.data.phases.map(phase => (
+  const [filter, setFilter] = useState<'all' | 'running' | 'completed'>('all')
+  const visiblePhases = useMemo(
+    () => filterPhases(node.data.phases, filter),
+    [filter, node.data.phases],
+  )
+  const phaseFacts = useMemo(() => visiblePhases.map(phase => (
     [phase.key, phaseDisclosureFacts(phase)] as const
-  )), [node.data.phases])
+  )), [visiblePhases])
   const runFacts = useMemo(
     () => runDisclosureFacts(node.data.status, phaseFacts),
     [node.data.status, phaseFacts],
   )
-  const totalMembers = runFacts.activityCount
   const [disclosures, setDisclosures] = useState<WorkflowDisclosureState>(() => ({
     run: initialDisclosureState(runFacts),
     phases: new Map(phaseFacts.map(([key, facts]) => [key, initialDisclosureState(facts)])),
@@ -346,7 +381,7 @@ export function WorkflowRunPanel({ node, sessionId, useSessions, openSession, t 
   const runContentRef = useRef<HTMLDivElement>(null)
   const phaseContentRefs = useRef(new Map<string, HTMLDivElement>())
   const navigable = useSessions(
-    sessions => navigableMembers(sessions, node.data.phases, sessionId),
+    sessions => navigableMembers(sessions, visiblePhases, sessionId),
     shallowEqual,
   )
 
@@ -431,17 +466,33 @@ export function WorkflowRunPanel({ node, sessionId, useSessions, openSession, t 
         : undefined}
     >
       <RunHeader
-        count={totalMembers}
+        completedCount={node.data.completedCount ?? 0}
+        count={node.data.phases.reduce((sum, phase) => sum + phase.members.length, 0)}
         name={node.data.name}
         open={disclosures.run.open}
         onToggle={toggleRun}
+        runningCount={node.data.runningCount ?? 0}
         status={node.data.status}
         t={t}
       >
+        <div className={css.filters} role="tablist">
+          {(['all', 'running', 'completed'] as const).map(value => (
+            <button
+              key={value}
+              type="button"
+              role="tab"
+              aria-selected={filter === value}
+              className={filter === value ? css.filterActive : css.filter}
+              onClick={() => { setFilter(value) }}
+            >
+              {t(value === 'all' ? 'filter.all' : value === 'running' ? 'filter.running' : 'filter.completed')}
+            </button>
+          ))}
+        </div>
         <div ref={runContentRef} className={css.phaseList} onBlur={settleRunBlur}>
-          {node.data.phases.length === 0
+          {visiblePhases.length === 0
             ? <span className={css.empty}>{t('run.empty')}</span>
-            : node.data.phases.map((phase) => {
+            : visiblePhases.map((phase) => {
               const facts = phaseDisclosureFacts(phase)
               const disclosure = disclosures.phases.get(phase.key) ?? initialDisclosureState(facts)
               return (
@@ -462,6 +513,14 @@ export function WorkflowRunPanel({ node, sessionId, useSessions, openSession, t 
                 />
               )
             })}
+        </div>
+        <div className={css.logs}>
+          <div className={css.logsTitle}>{t('logs.title')}</div>
+          {(node.data.logs ?? []).length === 0
+            ? <span className={css.empty}>{t('logs.empty')}</span>
+            : (node.data.logs ?? []).map((line, index) => (
+              <div key={`${index}:${line}`} className={css.logLine}>{line}</div>
+            ))}
         </div>
       </RunHeader>
     </section>

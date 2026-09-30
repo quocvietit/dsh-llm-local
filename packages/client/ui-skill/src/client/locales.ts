@@ -27,15 +27,3 @@ export const en = {
   'row.inspect': 'Inspect',
   'menu.userOnly': 'user-only',
 } satisfies Record<SkillKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'row.title': 'Skill',
-  'row.running': 'Đang tải skill',
-  'row.failed': 'Tải skill thất bại',
-  'row.stopped': 'Đã dừng tải skill',
-  'row.instructions': 'Hướng dẫn',
-  'row.inspect': 'Xem',
-  'menu.userOnly': 'chỉ người dùng',
-}
-

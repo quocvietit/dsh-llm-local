@@ -46,29 +46,5 @@ export const en: Record<ScheduleCatalogKey, string> = {
   'relative.future': 'in {value} {unit}',
   'relative.overdue': '{value} {unit} overdue',
 }
-
-
-
-/** Vietnamese dictionary. */
-export const vi: Record<ScheduleCatalogKey, string>  = {
-  'trigger.one': '{count} reminder',
-  'trigger.other': '{count} reminders',
-  'list.aria': 'Nhắc nhở đang hoạt động',
-  'status.scheduled': 'Đã lên lịch',
-  'status.overdue': 'Quá hạn',
-  'frequency.once': 'Một lần',
-  'frequency.every': 'Every {value} {unit}',
-  'unit.day.one': 'day',
-  'unit.day.other': 'days',
-  'unit.hour.one': 'hour',
-  'unit.hour.other': 'hours',
-  'unit.minute.one': 'minute',
-  'unit.minute.other': 'minutes',
-  'unit.second.one': 'second',
-  'unit.second.other': 'seconds',
-  'relative.now': 'Đến hạn ngay',
-  'relative.future': 'in {value} {unit}',
-  'relative.overdue': '{value} {unit} overdue',
-}
 /** Key domain of the Schedule catalog namespace. */
 export type ScheduleCatalogKey = keyof typeof zh

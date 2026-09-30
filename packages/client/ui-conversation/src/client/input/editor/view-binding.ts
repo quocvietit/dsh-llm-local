@@ -3,7 +3,7 @@ import type { MouseEvent, MutableRefObject, RefObject } from 'react'
 import type { LexicalEditor } from 'lexical'
 import type { ComposerKeyboard } from '../../contract/draft-editor.ts'
 import type { ComposerBarProps } from '../../contract/slots.ts'
-import type { BusyEnterBehavior } from '../../contract/composer-submission.ts'
+import type { BusyEnterBehavior, PlainEnterBehavior } from '../../contract/composer-submission.ts'
 import { resolveSubmitMode } from '../submission-policy.ts'
 import { registerComposerKeymap } from './keymap.ts'
 
@@ -14,6 +14,7 @@ interface DraftViewGate {
   running: boolean
   steeringAvailable: boolean
   busyEnter: BusyEnterBehavior
+  plainEnter: PlainEnterBehavior
   intakeFiles: (files: readonly File[]) => void
   uploadsPending: boolean
   showToast: (text: string) => void
@@ -116,6 +117,7 @@ export function installDraftKeymap(
     },
     dismissPopup: () => { keyboard.dismissPopup() },
     canSubmit: () => !gate.current.locked && !gate.current.machineBusy,
+    plainEnter: () => gate.current.plainEnter,
     submit: (accelerated) => {
       const g = gate.current
       // Empty-draft accelerated Enter acts on the queue instead of the

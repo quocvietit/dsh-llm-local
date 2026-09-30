@@ -79,6 +79,23 @@ export function subagentModelKey(route: AllowedSubagentModel): string {
 }
 
 /**
+ * Keep only routes from providers the user added (hand-declared), not shipped catalog defaults.
+ * @param groups - Live model directory grouped by provider.
+ * @param directory - Configurable-provider directory; omitted when the Host has not published one.
+ * @returns Groups the subagent allowlist may offer.
+ */
+export function userAddedCatalogGroups(
+  groups: readonly ModelProviderGroup[],
+  directory: readonly { provider: string; declared?: boolean }[] | undefined,
+): readonly ModelProviderGroup[] {
+  if (directory === undefined) return groups
+  const added = new Set(
+    directory.filter(entry => entry.declared === true).map(entry => entry.provider),
+  )
+  return groups.filter(group => added.has(group.id))
+}
+
+/**
  * Join live adapter metadata with stored routes that remain removable after disappearance.
  * @param groups - Current model directory grouped by provider.
  * @param stored - Routes in the effective settings value.
@@ -319,10 +336,21 @@ export class SubagentModelSelectionCardController {
     this.catalogStatus = 'loading'
     this.catalogPartial = false
     this.publish()
-    const response = await this.ctx.remote.session.modelCatalog()
+    const listDirectory = this.ctx.remote.llm?.listConfigurableProviders
+    const [response, directory] = await Promise.all([
+      this.ctx.remote.session.modelCatalog(),
+      typeof listDirectory === 'function'
+        ? listDirectory.call(this.ctx.remote.llm)
+        : Promise.resolve(undefined),
+    ])
     if (generation !== this.catalogGeneration) return
     if (response.ok) {
-      this.catalogGroups = response.value.groups
+      this.catalogGroups = [...userAddedCatalogGroups(
+        response.value.groups,
+        directory === undefined
+          ? undefined
+          : directory.ok ? directory.value : [],
+      )]
       this.catalogPartial = response.value.failures.length > 0
       this.catalogStatus = 'ready'
     } else {

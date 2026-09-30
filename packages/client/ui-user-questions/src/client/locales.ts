@@ -40,23 +40,3 @@ export const en = {
   'plan.decline': 'Refuse',
   'plan.discuss': 'Chat about it',
 } satisfies Record<QuestionKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'error.incomplete': 'Hãy hoàn thành câu hỏi này trước.',
-  'error.unanswered': 'Hãy chọn một tùy chọn hoặc nhập câu trả lời tùy chỉnh.',
-  'nav.prev': 'Câu trước',
-  'nav.next': 'Câu sau',
-  'nav.minimize': 'Thu gọn thẻ câu hỏi',
-  'nav.maximize': 'Mở rộng thẻ câu hỏi',
-  'nav.cancel': 'Dismiss all questions',
-  'option.recommended': 'Đề xuất',
-  'custom.placeholder': 'Nhập câu trả lời',
-  'action.skip': 'Bỏ qua câu này',
-  'action.next': 'Tiếp',
-  'plan.header': 'Duyệt kế hoạch',
-  'plan.approve': 'Phê duyệt',
-  'plan.decline': 'Từ chối',
-  'plan.discuss': 'Thảo luận trong chat',
-}
-

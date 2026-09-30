@@ -18,7 +18,7 @@ import type { ComposerBlock } from './composer-blocks.ts'
 import type { DraftAttachmentId, InputActions, InputNotice, InputState } from './input.ts'
 import type { ComposerKeyboard, EditSelection } from './draft-editor.ts'
 import type { createConversationStore } from '../stores.ts'
-import type { BusyEnterBehavior } from './composer-submission.ts'
+import type { BusyEnterBehavior, PlainEnterBehavior } from './composer-submission.ts'
 import type { ConversationSnapshot } from './snapshot.ts'
 import type { ViewTab } from './views.ts'
 
@@ -315,10 +315,12 @@ export interface ComposerBarInjected {
   stop: (() => void) | undefined
   hooks: {
     /**
-     * Live busy-state submission preference: the delivery mode plain Enter
-     * and the primary Send button use while the addressed agent is busy.
+     * Live busy-state submission preference: the delivery mode a send
+     * gesture and the primary Send button use while the addressed agent is busy.
      */
     busyEnter: ObservableSnapshot<BusyEnterBehavior>
+    /** Live unmodified-Enter preference: newline vs send. */
+    plainEnter: ObservableSnapshot<PlainEnterBehavior>
     /** Live per-draft upload states for file-kind drafts. */
     fileUploads: ObservableSnapshot<DraftFileUploads>
     notices: ObservableSnapshot<InputNotice | null>

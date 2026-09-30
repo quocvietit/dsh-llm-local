@@ -45,6 +45,9 @@
       "path": "../../host/plugin-inventory"
     },
     {
+      "path": "../../host/skill-library"
+    },
+    {
       "path": "../../interaction/commands"
     },
     {
@@ -55,6 +58,9 @@
     },
     {
       "path": "../../preset/agent-presets"
+    },
+    {
+      "path": "../../skill/skill"
     },
     {
       "path": "../../settings/settings"

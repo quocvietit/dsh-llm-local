@@ -57,28 +57,3 @@ export const en = {
   'error.generic': 'Could not save feedback',
   'error.noteTooLarge': 'The description is too long; shorten it and submit again',
 } satisfies Record<MessageFeedbackKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  'action.like': 'Câu trả lời tốt',
-  'action.likeActive': 'Bỏ đánh giá',
-  'action.dislike': 'Câu trả lời kém',
-  'action.dislikeActive': 'Bỏ đánh giá',
-  'dialog.title': 'Gửi phản hồi',
-  'dialog.categories': 'Feedback category',
-  'dialog.detail': 'Feedback details',
-  'dialog.hint': 'Thêm chi tiết để chúng tôi cải thiện. Nội dung gửi sẽ gồm nhật ký hội thoại hiện tại.',
-  'category.task-result': 'Task result',
-  'category.instruction-following': 'Hiểu và làm theo hướng dẫn',
-  'category.product-interaction': 'Tính năng sản phẩm và tương tác',
-  'category.service-stability': 'Service stability',
-  'category.resource-cost': 'Mức dùng tài nguyên và chi phí',
-  'category.security-privacy-permission': 'Bảo mật, quyền riêng tư và quyền hạn',
-  'category.other': 'Other',
-  'toast.recorded': 'Cảm ơn phản hồi của bạn',
-  'error.conflict': 'Phản hồi này đã đổi nơi khác; đang hiện trạng thái mới nhất',
-  'error.load': 'Could not load feedback',
-  'error.generic': 'Could not save feedback',
-  'error.noteTooLarge': 'Mô tả quá dài; hãy rút ngắn rồi gửi lại',
-}
-

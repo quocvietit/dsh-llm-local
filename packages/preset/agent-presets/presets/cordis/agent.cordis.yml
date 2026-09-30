@@ -211,6 +211,8 @@
       name: '@deepseek-ai/dsh-workflow-ptc'
       config:
         provider: spawn
+        maxConcurrentAgents: 8
+        maxTotalAgents: 64
 
     - id: tool-workflow
       name: '@deepseek-ai/dsh-tool-workflow'

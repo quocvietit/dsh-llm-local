@@ -22,6 +22,7 @@ import type {
 } from '@deepseek-ai/dsh-workflow'
 import type {
   ToolWorkflowAgentEndData, ToolWorkflowAgentStartData,
+  ToolWorkflowLogData, ToolWorkflowPhaseData,
   ToolWorkflowRunEndData, ToolWorkflowRunStartData,
 } from './types.ts'
 
@@ -53,6 +54,8 @@ interface ToolWorkflowRecordEventMap {
   'tool-workflow/run-start': ToolWorkflowRunStartData
   'tool-workflow/agent-start': ToolWorkflowAgentStartData
   'tool-workflow/agent-end': ToolWorkflowAgentEndData
+  'tool-workflow/phase': ToolWorkflowPhaseData
+  'tool-workflow/log': ToolWorkflowLogData
   'tool-workflow/run-end': ToolWorkflowRunEndData
 }
 
@@ -100,6 +103,7 @@ function createWorkflowRecorder(ctx: Context): WorkflowRecorder {
       label: agent.label,
       ...agent.phase === undefined ? {} : { phase: agent.phase },
       childId: agent.childId,
+      startedAt: new Date().toISOString(),
     }
     if (!append(session, 'tool-workflow/agent-start', data)) active.delete(info.id)
   })
@@ -110,8 +114,19 @@ function createWorkflowRecorder(ctx: Context): WorkflowRecorder {
       runId: info.id,
       seq: agent.seq,
       outcome: agent.outcome,
+      endedAt: new Date().toISOString(),
     }
     if (!append(session, 'tool-workflow/agent-end', data)) active.delete(info.id)
+  })
+  ctx.on('workflow/phase', (info, title) => {
+    const session = active.get(info.id)
+    if (session === undefined) return
+    if (!append(session, 'tool-workflow/phase', { runId: info.id, title })) active.delete(info.id)
+  })
+  ctx.on('workflow/log', (info, message) => {
+    const session = active.get(info.id)
+    if (session === undefined) return
+    if (!append(session, 'tool-workflow/log', { runId: info.id, message })) active.delete(info.id)
   })
 
   return {

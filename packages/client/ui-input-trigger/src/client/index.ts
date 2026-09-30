@@ -13,7 +13,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import { InputTriggerService } from './service.ts'
 import type { MenuViewInjected } from './slots.ts'
 import { MenuView } from './MenuView.tsx'
-import { en, vi, zh, type MenuKey } from './locales.ts'
+import { en, zh, type MenuKey } from './locales.ts'
 
 export { InputTriggerService } from './service.ts'
 export { InputTriggerController } from './controller.ts'
@@ -60,8 +60,7 @@ export function apply(ctx: ClientContext): void {
   ctx.plugin(InputTriggerService)
   ctx.effect(() => {
     const dispose = ctx.locale.register(MENU_NS, { zh, en })
-    const disposeVi = ctx.locale.register(MENU_NS, 'vi', vi)
-    return () => { dispose(); disposeVi() }
+    return () => { dispose() }
   }, 'ui-input-trigger: menu dictionaries')
   ctx.inject(['slots', 'inputTriggers', 'sessions'], (scope: ClientContext) => {
     const inputTriggers = scope.inputTriggers

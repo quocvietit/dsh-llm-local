@@ -1,5 +1,7 @@
 /** Browser-session authentication for the Host Connection carrier. */
 
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
 import { createHash, createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import { credentialKey } from '@deepseek-ai/dsh-credentials'
 import type { CredentialProvider, CredentialRecord } from '@deepseek-ai/dsh-credentials'
@@ -49,12 +51,44 @@ function decodeBase64Url(value: string): Buffer | undefined {
   return encodeBase64Url(decoded) === value ? decoded : undefined
 }
 
+function isLaunchToken(value: string): boolean {
+  const decoded = decodeBase64Url(value)
+  return decoded !== undefined && decoded.byteLength === SECRET_BYTES
+}
+
+function persistedLaunchTokenPath(): string | undefined {
+  const explicit = process.env.DSH_WEB_LAUNCH_TOKEN_FILE
+  if (explicit !== undefined && explicit !== '') return explicit
+  const home = process.env.DSH_HOME
+  if (home !== undefined && home !== '') return join(home, '.web-launch-token')
+  return undefined
+}
+
 function processLaunchToken(owner: object): string {
   const existing = PROCESS_LAUNCH_TOKENS.get(owner)
   if (existing !== undefined) return existing
-  const created = encodeBase64Url(randomBytes(SECRET_BYTES))
-  PROCESS_LAUNCH_TOKENS.set(owner, created)
-  return created
+  const fromEnv = process.env.DSH_WEB_LAUNCH_TOKEN?.trim()
+  let token = fromEnv !== undefined && isLaunchToken(fromEnv) ? fromEnv : undefined
+  const file = persistedLaunchTokenPath()
+  if (token === undefined && file !== undefined) {
+    try {
+      const stored = readFileSync(file, 'utf8').trim()
+      if (isLaunchToken(stored)) token = stored
+    } catch {
+      // First boot or an unreadable file: mint a token below.
+    }
+  }
+  if (token === undefined) token = encodeBase64Url(randomBytes(SECRET_BYTES))
+  if (file !== undefined) {
+    try {
+      mkdirSync(dirname(file), { recursive: true })
+      writeFileSync(file, `${token}\n`, { encoding: 'utf8', mode: 0o600 })
+    } catch {
+      // Windows bind mounts may reject mode bits; the in-process token still works.
+    }
+  }
+  PROCESS_LAUNCH_TOKENS.set(owner, token)
+  return token
 }
 
 function header(

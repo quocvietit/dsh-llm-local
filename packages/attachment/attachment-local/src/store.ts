@@ -21,6 +21,26 @@ import type { DetectedImage } from './image.ts'
 
 const ID_PATTERN = /^sha256:([a-f0-9]{64})$/
 const durableHomes = new Set<string>()
+const UNSUPPORTED_CHMOD = new Set(['EPERM', 'EACCES', 'ENOTSUP'])
+
+/**
+ * Apply a mode when the filesystem honors POSIX chmod. Bind-mounted
+ * `DSH_HOME` (Docker on Windows) rejects chmod on the volume root with
+ * EPERM; publication can still stage, link, and read the object.
+ * @param path - file or directory to mode.
+ * @param mode - POSIX mode bits.
+ */
+async function chmodIfSupported(path: string, mode: number): Promise<void> {
+  try {
+    await chmod(path, mode)
+  } catch (error) {
+    if (error instanceof Error && 'code' in error && typeof error.code === 'string'
+      && UNSUPPORTED_CHMOD.has(error.code)) {
+      return
+    }
+    throw error
+  }
+}
 
 function digest(data: Uint8Array): string {
   return createHash('sha256').update(data).digest('hex')
@@ -156,8 +176,8 @@ async function syncDirectory(path: string): Promise<void> {
 async function ensureDurableDirectory(path: string, boundary: string): Promise<void> {
   const target = resolve(path)
   const stop = resolve(boundary)
-  await mkdir(target, { recursive: true, mode: 0o700 })
-  await chmod(target, 0o700)
+  await mkdir(target, { recursive: true })
+  await chmodIfSupported(target, 0o700)
   let level = target
   while (level !== stop) {
     const parent = dirname(level)
@@ -288,7 +308,7 @@ export async function publishImmutableAlias(
         throw new AttachmentError('Stored attachment failed integrity verification.', 'ATTACHMENT_CORRUPT')
       }
     }
-    await chmod(target, 0o400)
+    await chmodIfSupported(target, 0o400)
     const stop = resolve(root)
     for (let level = parent; level !== stop; level = dirname(level)) {
       await syncDirectory(level)
@@ -369,7 +389,7 @@ async function publishStagedObject(
     await unlink(staged.path)
     // The target remains the sole link for a new object; this also restores
     // read-only mode when the deduplication path observes an existing object.
-    await chmod(target, 0o400)
+    await chmodIfSupported(target, 0o400)
     // Persist the target entry and close every concurrent parent-creation
     // window before the reference can reach a session checkpoint. The dedup
     // path repeats these syncs because it may observe another writer's link

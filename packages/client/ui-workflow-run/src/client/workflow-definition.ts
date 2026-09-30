@@ -4,7 +4,7 @@ import type {
 import type { ChatConversationViewNode } from '@deepseek-ai/dsh-client-ui-chat/client'
 import type { SessionId } from '@deepseek-ai/dsh-session/types'
 import type {
-  ToolWorkflowAgentEndData, ToolWorkflowAgentStartData,
+  ToolWorkflowAgentEndData, ToolWorkflowAgentStartData, ToolWorkflowLogData,
 } from '@deepseek-ai/dsh-tool-workflow/types'
 import type { WorkflowAgentOutcome, WorkflowStopReason } from '@deepseek-ai/dsh-workflow/types'
 
@@ -17,6 +17,8 @@ export interface WorkflowRunMemberData {
   readonly label: string
   readonly childId: SessionId
   readonly status: WorkflowRunStatus
+  readonly startedAt?: string
+  readonly endedAt?: string
 }
 
 /** Final renderer data for one exact phase identity. */
@@ -32,6 +34,9 @@ export interface WorkflowRunChatData {
   readonly name: string
   readonly status: WorkflowRunStatus
   readonly phases: readonly WorkflowRunPhaseData[]
+  readonly logs?: readonly string[]
+  readonly runningCount?: number
+  readonly completedCount?: number
 }
 
 declare module '@deepseek-ai/dsh-client-ui-chat/client' {
@@ -43,12 +48,14 @@ declare module '@deepseek-ai/dsh-client-ui-chat/client' {
 
 interface WorkflowMemberState extends Omit<ToolWorkflowAgentStartData, 'runId'> {
   readonly outcome?: WorkflowAgentOutcome
+  readonly endedAt?: string
 }
 
 interface WorkflowState {
   readonly name: string
   readonly stopReason?: WorkflowStopReason
   readonly members: readonly WorkflowMemberState[]
+  readonly logs: readonly string[]
 }
 
 /**
@@ -110,6 +117,8 @@ function projectWorkflow(
       status: member.outcome === undefined
         ? interrupted ? 'interrupted' : 'running'
         : statusFromOutcome(member.outcome),
+      ...member.startedAt === undefined ? {} : { startedAt: member.startedAt },
+      ...member.endedAt === undefined ? {} : { endedAt: member.endedAt },
     })
   }
   const projectedPhases = [...phases].map(([key, phase]) => ({
@@ -117,12 +126,16 @@ function projectWorkflow(
     phase: phase.phase,
     members: phase.members,
   }))
+  const members = projectedPhases.flatMap(phase => phase.members)
   return {
     name: state.name,
     status: state.stopReason === undefined
       ? interrupted ? 'interrupted' : 'running'
       : statusFromStopReason(state.stopReason),
     phases: projectedPhases,
+    logs: state.logs ?? [],
+    runningCount: members.filter(member => member.status === 'running').length,
+    completedCount: members.filter(member => member.status !== 'running').length,
   }
 }
 
@@ -132,6 +145,7 @@ function updateAgentStart(state: WorkflowState, data: ToolWorkflowAgentStartData
     label: data.label,
     ...data.phase === undefined ? {} : { phase: data.phase },
     childId: data.childId,
+    ...data.startedAt === undefined ? {} : { startedAt: data.startedAt },
   }
   return { ...state, members: [...state.members, member] }
 }
@@ -140,9 +154,13 @@ function updateAgentEnd(state: WorkflowState, data: ToolWorkflowAgentEndData): W
   return {
     ...state,
     members: state.members.map(member => member.seq === data.seq
-      ? { ...member, outcome: data.outcome }
+      ? { ...member, outcome: data.outcome, ...data.endedAt === undefined ? {} : { endedAt: data.endedAt } }
       : member),
   }
+}
+
+function updateLog(state: WorkflowState, data: ToolWorkflowLogData): WorkflowState {
+  return { ...state, logs: [...state.logs, data.message] }
 }
 
 /** Durable workflow event family folded into one keyed Chat node. */
@@ -153,6 +171,8 @@ export const workflowRunDefinition: ConversationNodeDefinition<WorkflowState> = 
     if (event.type === 'tool-workflow/run-start') return { id: String(event.data.runId), role: 'start' }
     if (event.type === 'tool-workflow/agent-start'
       || event.type === 'tool-workflow/agent-end'
+      || event.type === 'tool-workflow/log'
+      || event.type === 'tool-workflow/phase'
       || event.type === 'tool-workflow/run-end') {
       return { id: String(event.data.runId), role: 'update' }
     }
@@ -162,7 +182,7 @@ export const workflowRunDefinition: ConversationNodeDefinition<WorkflowState> = 
     if (match.event.type !== 'tool-workflow/run-start') {
       throw new Error('workflow-run start requires tool-workflow/run-start')
     }
-    return { name: match.event.data.name, members: [] }
+    return { name: match.event.data.name, members: [], logs: [] }
   },
   update: (context, match) => {
     if (match.event.type === 'tool-workflow/agent-start') {
@@ -170,6 +190,12 @@ export const workflowRunDefinition: ConversationNodeDefinition<WorkflowState> = 
     }
     if (match.event.type === 'tool-workflow/agent-end') {
       return updateAgentEnd(context.state, match.event.data)
+    }
+    if (match.event.type === 'tool-workflow/log') {
+      return updateLog(context.state, match.event.data)
+    }
+    if (match.event.type === 'tool-workflow/phase') {
+      return context.state
     }
     if (match.event.type === 'tool-workflow/run-end') {
       return { ...context.state, stopReason: match.event.data.stopReason }

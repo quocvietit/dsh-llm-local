@@ -54,26 +54,3 @@ export const en = {
   'error.unavailable': 'Read failed: {message}',
   retry: 'Retry',
 } satisfies Record<SidebarDocumentPreviewKey, string>
-
-/** Vietnamese dictionary. */
-export const vi = {
-  loading: 'Đang đọc…',
-  loadMore: 'Tải thêm',
-  changed: 'The file has changed, showing the previous content.',
-  reloadNow: 'Tải lại',
-  reload: 'Read the file again',
-  'wrap.enable': 'Bật xuống dòng',
-  'wrap.disable': 'Tắt xuống dòng',
-  'wrap.aria': 'Xuống dòng',
-  openWith: 'Mở bằng',
-  'viewer.text': 'Văn bản thuần',
-  resourceUnavailable: 'The file resource service is unavailable.',
-  rendererUnavailable: 'The {name} preview is unavailable.',
-  'error.notFound': 'File not found. It may have been moved or deleted.',
-  'error.tooLarge': 'Trang này vượt giới hạn {limit} nên không đọc được.',
-  'error.notText': 'Not a text file, preview is unavailable for now.',
-  'error.notRegularFile': 'Not a regular file, nothing to display.',
-  'error.unavailable': 'Đọc thất bại: {message}',
-  retry: 'Thử lại',
-}
-
