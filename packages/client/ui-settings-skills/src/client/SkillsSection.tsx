@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import type { SkillLibraryEntry, SkillLibraryLocation, SkillLibraryRecord } from '@deepseek-ai/dsh-api-remotes/client'
 import type {} from '@deepseek-ai/dsh-client-ui-workspace/client'
-import { Button, IconPlusOutline16, Input, Modal, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
+import { Button, IconPlusOutlineRegular, Input, Modal, Tag } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale, PropsRuntime } from '@deepseek-ai/dsh-client-ui-slots'
 import type { SkillsLocaleKey } from './locales.ts'
 import css from './SkillsSection.module.css'
@@ -86,7 +86,7 @@ export function SkillsSection(props: SkillsSectionProps): React.ReactNode {
         <Button
           variant="primary"
           size="sm"
-          icon={<IconPlusOutline16 />}
+          icon={<IconPlusOutlineRegular />}
           onClick={() => { setDialog({ kind: 'create' }) }}
         >
           {t('create')}
@@ -129,7 +129,7 @@ export function SkillsSection(props: SkillsSectionProps): React.ReactNode {
         dialog={dialog}
         workspaceRoot={workspaceRoot}
         onClose={() => { setDialog({ kind: 'closed' }) }}
-        onAskDelete={skill => { setDialog({ kind: 'delete', skill }) }}
+        onAskDelete={(skill) => { setDialog({ kind: 'delete', skill }) }}
         get={props.get}
         create={props.create}
         update={props.update}
@@ -199,7 +199,7 @@ function EditorDialog({
     setError(undefined)
     let cancelled = false
     void get(dialog.skill.name, dialog.skill.location, workspaceRoot).then(
-      record => {
+      (record) => {
         if (cancelled) return
         setDescription(record.description)
         setBody(record.body)
@@ -265,7 +265,7 @@ function EditorDialog({
           <Input
             value={name}
             disabled={editing !== undefined}
-            onChange={event => { setName(event.target.value) }}
+            onChange={(event) => { setName(event.target.value) }}
             aria-describedby="skill-name-hint"
           />
         </label>
@@ -275,7 +275,7 @@ function EditorDialog({
           <Input
             value={description}
             disabled={readOnly}
-            onChange={event => { setDescription(event.target.value) }}
+            onChange={(event) => { setDescription(event.target.value) }}
           />
         </label>
         {editing === undefined && (
@@ -303,7 +303,7 @@ function EditorDialog({
             className={css.textarea}
             value={body}
             disabled={readOnly}
-            onChange={event => { setBody(event.target.value) }}
+            onChange={(event) => { setBody(event.target.value) }}
           />
         </label>
         {error !== undefined && <p className={css.error}>{error}</p>}

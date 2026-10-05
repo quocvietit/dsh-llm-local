@@ -14,7 +14,6 @@ interface DraftViewGate {
   running: boolean
   steeringAvailable: boolean
   busyEnter: BusyEnterBehavior
-  busyEnter: BusyEnterBehavior
   plainEnter: PlainEnterBehavior
   intakeFiles: (files: readonly File[], directories?: ReadonlySet<File>) => void
   uploadsPending: boolean

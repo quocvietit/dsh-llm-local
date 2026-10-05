@@ -342,7 +342,7 @@ describe('ModelsSection', () => {
   it('hides catalog Add provider when catalogAdd is off', async () => {
     await mountFace(scriptedFace(), { catalogAdd: false })
     expect(screen.queryByRole('button', { name: en.add })).toBeNull()
-    expect(screen.getByRole('button', { name: en.customAdd })).toBeTruthy()
+    expect(screen.getByRole('button', { name: en.addCustom })).toBeTruthy()
   })
 
   it('offers only providers whose settings namespace can open an editor', async () => {
@@ -463,7 +463,7 @@ describe('ModelsSection', () => {
     expect(screen.getByText('openai')).toBeTruthy()
     expect(screen.queryByText('Active')).toBeNull()
     expect(screen.queryByText('Inactive')).toBeNull()
-    expect(screen.getByRole('button', { name: en.customAdd })).toBeTruthy()
+    expect(screen.getByRole('button', { name: en.addCustom })).toBeTruthy()
   })
 
   it('leaves the unkeyed provider a plain row once another provider is usable', async () => {
@@ -579,7 +579,7 @@ describe('ModelsSection', () => {
     expect((await screen.findByRole('status')).textContent).toBe(
       providerCopy(en.savedProvider, { provider: 'deepseek-official', displayName: 'DeepSeek' }),
     )
-    fireEvent.click(screen.getByText(en.customAdd))
+    fireEvent.click(screen.getByText(en.addCustom))
   })
 
   it('reuses the provider editor as a required credential-only onboarding form', async () => {
@@ -1462,7 +1462,7 @@ describe('ModelsSection', () => {
     />)
     expect(screen.getByText(en.readOnly)).toBeTruthy()
     expect(screen.getAllByText<HTMLButtonElement>(en.remove).every(button => button.disabled)).toBe(true)
-    expect(screen.getByText<HTMLButtonElement>(en.customAdd).disabled).toBe(true)
+    expect(screen.getByText<HTMLButtonElement>(en.addCustom).disabled).toBe(true)
   })
 
   it('toggles the row editor closed on a second edit click and on cancel', async () => {

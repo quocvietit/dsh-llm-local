@@ -207,7 +207,6 @@ function bench(over?: BenchOptions) {
     }),
     toggleCommandMenu: over?.toggleCommandMenu ?? vi.fn(),
     useBusyEnter: bindSnapshotSelector(busyEnter),
-    useBusyEnter: bindSnapshotSelector(busyEnter),
     usePlainEnter: bindSnapshotSelector(plainEnter),
     useStopShortcut: bindSnapshotSelector(stopShortcut),
     useNotices: bindSnapshotSelector(shell.notices),
