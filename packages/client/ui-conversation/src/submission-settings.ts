@@ -38,7 +38,10 @@ export interface ConversationSettings {
 }
 
 /** Durable conversation schema; also the wire envelope the browser scope validates against. */
-export const ConversationSettingsSchema: z<ConversationSettings> = z.object({
+export const ConversationSettingsFields = {
   [BUSY_ENTER_FIELD]: z.union([...BUSY_ENTER_BEHAVIORS]).default(DEFAULT_BUSY_ENTER_BEHAVIOR),
   [PLAIN_ENTER_FIELD]: z.union([...PLAIN_ENTER_BEHAVIORS]).default(DEFAULT_PLAIN_ENTER_BEHAVIOR),
-})
+}
+
+/** Schema for shared configuration values. */
+export const ConversationSettingsSchema = z.object(ConversationSettingsFields)

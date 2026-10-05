@@ -14,8 +14,9 @@ interface DraftViewGate {
   running: boolean
   steeringAvailable: boolean
   busyEnter: BusyEnterBehavior
+  busyEnter: BusyEnterBehavior
   plainEnter: PlainEnterBehavior
-  intakeFiles: (files: readonly File[]) => void
+  intakeFiles: (files: readonly File[], directories?: ReadonlySet<File>) => void
   uploadsPending: boolean
   showToast: (text: string) => void
   t: ComposerBarProps['t']
@@ -136,9 +137,9 @@ export function installDraftKeymap(
         g.running,
         accelerated ? 'accelerated' : 'enter',
         g.steeringAvailable,
-      ))
+      ), 'enter')
     },
-    intakeFiles: (files) => { gate.current.intakeFiles(files) },
+    intakeFiles: (files, directories) => { gate.current.intakeFiles(files, directories) },
     pasteText: (text) => {
       if (gate.current.machineBusy || gate.current.locked) return
       keyboard.paste(text)
