@@ -42,9 +42,6 @@ check('llm-deepseek-account disabled', /^- id: llm-deepseek-account\n\s+disabled
 check('deepseek-account disabled', /^- id: deepseek-account\n\s+disabled: true/m.test(webApp))
 check('web-search-deepseek disabled', /^- id: web-search-deepseek\n\s+disabled: true/m.test(webApp))
 
-// Models UI catalog hidden
-check('ui-settings-models catalogAdd: false', /^- id: ui-settings-models\n\s+config:\n\s+catalogAdd: false/m.test(webApp))
-
 // Feedback features disabled
 check('command-feedback disabled', /^- id: command-feedback\n\s+disabled: true/m.test(webApp))
 check('message-feedback disabled', /^- id: message-feedback\n\s+disabled: true/m.test(webApp))
@@ -61,7 +58,7 @@ try {
   check('ui-message-feedback disabled in profile', /^- id: ui-message-feedback\n\s+disabled: true/m.test(profile))
   check('command-feedback disabled in profile', /^- id: command-feedback\n\s+disabled: true/m.test(profile))
   check('message-feedback disabled in profile', /^- id: message-feedback\n\s+disabled: true/m.test(profile))
-  check('ui-settings-models catalogAdd:false in profile', /catalogAdd: false/.test(profile))
+  check('message-feedback disabled in profile', /^- id: message-feedback\n\s+disabled: true/m.test(profile))
 } catch {
   console.log('\n  (profile not found — run from within the dsh-docker checkout)')
 }

@@ -608,13 +608,6 @@
 - id: web-search-deepseek
   disabled: true
 
-# ── custom fork: hide "Add provider" catalog in Settings → Models ────────────
-# Only "Add a custom provider" remains; the built-in catalog of
-# OpenAI / Anthropic / DeepSeek entries is hidden.
-- id: ui-settings-models
-  config:
-    catalogAdd: false
-
 # ── custom fork: remove feedback features ───────────────────────────────────
 # Remove Like/Dislike UI, /feedback command, and the server-side backend.
 - id: command-feedback
