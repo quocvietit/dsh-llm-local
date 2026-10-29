@@ -610,3 +610,9 @@
 
 - id: ui-message-feedback
   disabled: true
+
+# ── custom fork: disable external plugin install UI ─────────────────────────
+# Users cannot add / remove plugins from the web UI.  Plugins are pre-baked
+# into the image; the read-only inventory in Settings → Plugins stays active.
+- id: ui-plugin-manager
+  disabled: true
