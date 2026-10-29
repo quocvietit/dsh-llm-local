@@ -366,7 +366,7 @@ function Loaded({ injected, renderSlot }: { injected: ModelsSectionFace; renderS
   // step: whether the user already has a provider to talk to.
   const anyUsable = state.rows.some(providerUsable)
   const configured = state.rows.filter(row => row.configured)
-  const configurable = state.rows.filter(row => state.namespaces.has(row.entry.settingsNs))
+  const _configurable = state.rows.filter(row => state.namespaces.has(row.entry.settingsNs))
   const addable: AddableRow[] = state.rows.flatMap((row) => {
     const namespace = state.namespaces.get(row.entry.settingsNs)
     return namespace === undefined || row.configured ? [] : [{ row, namespace }]
@@ -383,7 +383,7 @@ function Loaded({ injected, renderSlot }: { injected: ModelsSectionFace; renderS
   // the shown mode or has been shown since the card opened — derived, so a
   // refresh that changes which modes are offered can never leave the card
   // without a panel.
-  const catalogOffered = configurable.length > 0
+  const catalogOffered = false // custom fork: hide catalog tab, use custom providers only
   const catalogEnabled = addable.length > 0
   const customOffered = piAi !== undefined
   const customEnabled = protocols.length > 0
