@@ -17,7 +17,7 @@ import {
   IconInfoOutlineRegular, IconRefreshOutlineRegular, IconTrashOutlineRegular,
   IconWarningOutlineRegular, Input, Modal, pointerModality,
   PluginArtworkDefault, PluginArtworkLoop, PluginArtworkSearch, PluginArtworkSubagent, PluginArtworkTerminal,
-  SegmentedTabs, StateDot, Switch, Tag, TerminalBlock, Toast, Tooltip, useAnchoredPosition, useDismissOnOutsidePointer,
+  SegmentedTabs, StateDot, Switch, Tag, TerminalBlock, Toast, Tooltip, useDismissOnOutsidePointer,
   type IconProps, type StateDotState, type TerminalBlockLabels,
 } from '@deepseek-ai/dsh-client-ui-primitives'
 import type { InjectFace, PropsLocale, PropsRenderSlots, PropsRuntime, PropsStore } from '@deepseek-ai/dsh-client-ui-slots'
@@ -904,7 +904,9 @@ function failureText(failure: InstallState['failure'], t: Translate, install?: P
   }
   if (failure.kind !== undefined) return t(FAILURE_KIND_KEYS[failure.kind])
   if (failure.code !== undefined) return managementText({ code: failure.code, diagnostic: failure.reason }, t)
-  return failure.reason === '' ? t('installFailureGeneric') : failure.reason
+  if (failure.reason !== '') return failure.reason
+  // An enabled install that failed applying the bundle names that step, never the install command it already finished.
+  return failure.stage === 'enable' && failure.enabled === true ? t('installFailedEnabling') : t('installFailureGeneric')
 }
 
 interface SubjectLines {
@@ -1001,13 +1003,10 @@ function InstallDialog({
   const registryShown = install.registryOpen && phase === 'idle'
   const specComposition = useInstallComposition(install.open && phase === 'idle')
   const registryComposition = useInstallComposition(install.open && registryShown)
-  const registryPosition = useAnchoredPosition({
-    open: registryShown, anchorRef: registryToggleRef, panelRef: registryPanelRef, align: 'end', gap: 6, margin: 12,
-  })
-  const registryReady = registryShown && registryPosition !== null
+  const registryAnchorName = `--dsh-registry-${registryId.replaceAll(':', '')}`
   useEffect(() => {
-    if (registryReady && install.registryError) registryCustomRef.current?.focus()
-  }, [registryReady, install.registryError])
+    if (registryShown && install.registryError) registryCustomRef.current?.focus()
+  }, [registryShown, install.registryError])
   // The hook only ever asks to close.
   useDismissOnOutsidePointer(registryToggleRef, registryShown, onToggleRegistry, registryPanelRef)
   useEffect(() => {
@@ -1157,6 +1156,7 @@ function InstallDialog({
             </button>
             <button
               ref={registryToggleRef}
+              style={{ anchorName: registryAnchorName }}
               type="button"
               className={css.registryToggle}
               aria-expanded={install.registryOpen}
@@ -1206,7 +1206,7 @@ function InstallDialog({
                 ref={registryPanelRef}
                 id={registryId}
                 className={css.registry}
-                style={registryPosition ?? { visibility: 'hidden', left: 0, top: 0 }}
+                style={{ positionAnchor: registryAnchorName }}
                 data-install-registry
                 aria-label={t('registryLegend')}
                 onKeyDown={(event) => {
@@ -1289,6 +1289,8 @@ function InstallDialog({
   }
   const heading = t(phase === 'done' && install.subject?.bundled ? 'installBundledTitle' : SCREEN_TITLE_KEYS[phase])
   const pending = isInstallPending(phase)
+  // A settled screen whose install never reported a run can say the details received no terminal output.
+  const settledDetails = phase === 'failed' || phase === 'done' || phase === 'unknown'
   const cancellable = phase === 'starting' || phase === 'running' || phase === 'unconfirmed'
   const stoppable = cancellable || phase === 'failed' || phase === 'unknown'
   const failure = install.failure
@@ -1349,6 +1351,10 @@ function InstallDialog({
             <h2 className={css.wizardTitle} role={phase === 'failed' ? 'alert' : 'status'}>{heading}</h2>
             {phase === 'done' && subject?.bundled ? <p className={css.wizardSub}>{t('installBundledDescription')}</p> : null}
             {phase === 'failed' ? <p className={css.wizardSub}>{failureText(install.failure, t, install)}</p> : null}
+            {phase === 'failed' && failure?.stage === 'enable' && failure.enabled === true
+              && (failure.code !== undefined || failure.reason !== '')
+              ? <p className={css.wizardSub}>{t('installFailedEnabling')}</p>
+              : null}
             {attemptLine === null ? null : <p className={css.wizardSub}>{attemptLine}</p>}
             {uncertaintyText === null ? null : <p className={css.wizardSub} role="alert">{uncertaintyText}</p>}
             {phase === 'unknown' ? <p className={css.wizardSub}>{t('installUnknownDescription')}</p> : null}
@@ -1420,7 +1426,11 @@ function InstallDialog({
           {install.detailsOpen
             ? (
               <div className={css.detailsBody}>
-                <p className={css.installLocation}>{firstRun === undefined ? t('terminalNoOutput') : t('installLocation', { dir: firstRun.cwd })}</p>
+                {firstRun !== undefined
+                  ? <p className={css.installLocation}>{t('installLocation', { dir: firstRun.cwd })}</p>
+                  : settledDetails
+                    ? <p className={css.installLocation}>{t('installDetailsNoOutput')}</p>
+                    : null}
                 {install.runs.map((run, index) => {
                   const registry = asked?.registries[index]
                   return (
@@ -1440,6 +1450,9 @@ function InstallDialog({
                     </div>
                   )
                 })}
+                {install.logPath === null
+                  ? null
+                  : <p className={css.installLocation}>{t('installLogPath', { path: install.logPath })}</p>}
               </div>
             )
             : null}
